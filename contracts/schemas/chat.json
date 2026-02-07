@@ -1,0 +1,55 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Chat Endpoint",
+  "description": "Schema for the /chat endpoint.",
+  "type": "object",
+  "properties": {
+    "request": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "session_id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": ["message"]
+    },
+    "response": {
+      "type": "object",
+      "properties": {
+        "reply": {
+          "type": "string"
+        },
+        "session_id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": ["reply", "session_id"]
+    }
+  },
+  "examples": [
+    {
+      "request": {
+        "message": "Hello, what can you tell me about sustainable investing?",
+        "session_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+      },
+      "response": {
+        "reply": "Sustainable investing considers environmental, social, and governance (ESG) factors. Would you like to know more about a specific area?",
+        "session_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+      }
+    },
+    {
+      "request": {
+        "message": "Tell me about environmental factors."
+      },
+      "response": {
+        "reply": "Environmental factors include a company's impact on the planet, such as carbon emissions, water usage, and waste management. Companies with good environmental practices are often seen as better long-term investments.",
+        "session_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+      }
+    }
+  ]
+}
