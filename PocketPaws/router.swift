@@ -50,6 +50,7 @@ private struct AuthResponseBody: Decodable {
 private struct StoredSession: Codable {
     let userId: String
     let token: String
+    let petName: String?
 }
 
 @MainActor
@@ -59,6 +60,7 @@ class Router: ObservableObject {
     @Published private(set) var isAuthenticated = false
     @Published private(set) var currentUserId: String?
     @Published private(set) var authToken: String?
+    @Published var petName: String = MockData.pet.name
     @Published var isAuthenticating = false
     @Published var authError: String?
 
@@ -125,6 +127,7 @@ class Router: ObservableObject {
         isAuthenticated = false
         currentUserId = nil
         authToken = nil
+        petName = MockData.pet.name
         authError = nil
         clearStoredSession()
         popToRoot()
@@ -202,9 +205,11 @@ class Router: ObservableObject {
 
         isSendingChat = true
         defer { isSendingChat = false }
+        let startedAt = Date()
 
         do {
             let response = try await requestChatReply(message: message)
+            await ensureTypingVisible(since: startedAt)
             appendChatMessage(
                 ChatMessage(
                     id: UUID(),
@@ -217,6 +222,7 @@ class Router: ObservableObject {
             )
             suggestedChatActions = response.quick_actions
         } catch {
+            await ensureTypingVisible(since: startedAt)
             chatError = "Could not reach the assistant service."
             appendChatMessage(
                 ChatMessage(
@@ -280,16 +286,19 @@ class Router: ObservableObject {
             }
 
             let decoded = try JSONDecoder().decode(AuthResponseBody.self, from: data)
+            let resolvedName = resolvedPetName(from: decoded.user.displayName)
             isAuthenticated = true
             currentUserId = decoded.user.id
             authToken = decoded.token
-            persistSession(userId: decoded.user.id, token: decoded.token)
+            petName = resolvedName
+            persistSession(userId: decoded.user.id, token: decoded.token, petName: resolvedName)
             popToRoot()
             currentTab = .home
         } catch {
             isAuthenticated = false
             currentUserId = nil
             authToken = nil
+            petName = MockData.pet.name
             clearStoredSession()
             authError = error.localizedDescription
         }
@@ -321,7 +330,7 @@ class Router: ObservableObject {
         var request = URLRequest(url: chatURL)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.timeoutInterval = 12
+        request.timeoutInterval = 30
 
         for (header, value) in gatewayAuthHeaders() {
             request.setValue(value, forHTTPHeaderField: header)
@@ -342,6 +351,15 @@ class Router: ObservableObject {
         return try JSONDecoder().decode(ChatResponseBody.self, from: data)
     }
 
+    private func ensureTypingVisible(since startedAt: Date) async {
+        let minimumTypingDuration: TimeInterval = 0.8
+        let elapsed = Date().timeIntervalSince(startedAt)
+        guard elapsed < minimumTypingDuration else { return }
+        let remaining = minimumTypingDuration - elapsed
+        let nanos = UInt64(max(0, remaining) * 1_000_000_000)
+        try? await Task.sleep(nanoseconds: nanos)
+    }
+
     private func persistChatMessages() {
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
@@ -356,8 +374,8 @@ class Router: ObservableObject {
         return try? decoder.decode([ChatMessage].self, from: encoded)
     }
 
-    private func persistSession(userId: String, token: String) {
-        let session = StoredSession(userId: userId, token: token)
+    private func persistSession(userId: String, token: String, petName: String) {
+        let session = StoredSession(userId: userId, token: token, petName: petName)
         guard let encoded = try? JSONEncoder().encode(session) else { return }
         UserDefaults.standard.set(encoded, forKey: authStorageKey)
     }
@@ -373,6 +391,7 @@ class Router: ObservableObject {
 
         currentUserId = session.userId
         authToken = session.token
+        petName = resolvedPetName(from: session.petName ?? "")
         isAuthenticated = true
     }
 
@@ -389,5 +408,10 @@ class Router: ObservableObject {
             return fallback
         }
         return parsed
+    }
+
+    private func resolvedPetName(from rawName: String) -> String {
+        let trimmed = rawName.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? MockData.pet.name : trimmed
     }
 }

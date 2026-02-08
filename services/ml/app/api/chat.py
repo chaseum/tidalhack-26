@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 from typing import Any
 
@@ -12,7 +13,7 @@ from app.services.featherless_client import text_chat
 
 router = APIRouter()
 
-CHAT_TIMEOUT_SECONDS = 8.0
+CHAT_TIMEOUT_SECONDS = float(os.getenv("CHAT_TIMEOUT_SECONDS", "18"))
 MAX_REPLY_SENTENCES = 6
 MAX_QUICK_ACTIONS = 4
 

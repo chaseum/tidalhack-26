@@ -49,19 +49,23 @@ struct PetAvatarBadgeView: View {
 
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
-            AsyncImage(url: URL(string: pet.imageURL)) { image in
-                image
-                    .resizable()
-                    .scaledToFill()
-            } placeholder: {
-                DesignTokens.Colors.border
-                    .overlay(ProgressView())
-            }
-            .frame(width: size, height: size)
-            .clipShape(Circle())
-            .overlay(Circle().stroke(Color.white.opacity(0.9), lineWidth: 4))
-            .overlay(Circle().stroke(DesignTokens.Colors.border, lineWidth: 1))
-            .shadow(color: Color.black.opacity(0.1), radius: 15, x: 0, y: 3)
+            Circle()
+                .fill(
+                    LinearGradient(
+                        colors: [DesignTokens.Colors.primary, DesignTokens.Colors.secondary],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .frame(width: size, height: size)
+                .overlay(
+                    Image(systemName: "pawprint.fill")
+                        .font(.system(size: size * 0.44, weight: .black))
+                        .foregroundColor(.white)
+                )
+                .overlay(Circle().stroke(Color.white.opacity(0.9), lineWidth: 4))
+                .overlay(Circle().stroke(DesignTokens.Colors.border, lineWidth: 1))
+                .shadow(color: Color.black.opacity(0.1), radius: 15, x: 0, y: 3)
 
             LevelChip(level: pet.level)
                 .offset(x: 10, y: 4)

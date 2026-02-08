@@ -31,5 +31,9 @@ export const config = {
   ML_BASE_URL: process.env.ML_BASE_URL ?? "http://127.0.0.1:8000",
   RATE_LIMIT_RPM: parseNumber(process.env.RATE_LIMIT_RPM, 60),
   REQUEST_TIMEOUT_MS: parseNumber(process.env.REQUEST_TIMEOUT_MS, 8000),
+  CHAT_REQUEST_TIMEOUT_MS: parseNumber(
+    process.env.CHAT_REQUEST_TIMEOUT_MS,
+    parseNumber(process.env.REQUEST_TIMEOUT_MS, 20000)
+  ),
   DEBUG: parseBoolean(process.env.DEBUG, false)
 };

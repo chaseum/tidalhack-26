@@ -9,7 +9,6 @@ struct HomeLauncherView: View {
     @State private var showLauncher = false
     @State private var showProTip = false
 
-    let pet = MockData.pet
     let weeklyActivity = MockData.weeklyActivity
 
     let columns = [
@@ -88,6 +87,12 @@ struct HomeLauncherView: View {
             Text(activeNotice ?? "")
         }
         .navigationBarHidden(true)
+    }
+
+    private var pet: Pet {
+        var current = MockData.pet
+        current.name = router.petName
+        return current
     }
 
     private var header: some View {
@@ -325,7 +330,6 @@ struct HomeLauncherView_Preview: PreviewProvider
 
 struct HealthStatusView: View {
     @EnvironmentObject var router: Router
-    let pet = MockData.pet
 
     var body: some View {
         ZStack {
@@ -371,7 +375,7 @@ struct HealthStatusView: View {
                         VStack(alignment: .leading, spacing: DesignTokens.Spacing.s) {
                             Text("Advice")
                                 .font(DesignTokens.Typography.headline)
-                            Text("Keep Pixel hydrated and add one outdoor play session to boost mood.")
+                            Text("Keep \(pet.name) hydrated and add one outdoor play session to boost mood.")
                                 .font(DesignTokens.Typography.body)
                                 .foregroundColor(DesignTokens.Colors.textSecondary)
                         }
@@ -396,6 +400,12 @@ struct HealthStatusView: View {
         case ..<0.85: return "Good"
         default: return "Excellent"
         }
+    }
+
+    private var pet: Pet {
+        var current = MockData.pet
+        current.name = router.petName
+        return current
     }
 }
 

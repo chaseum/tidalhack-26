@@ -4,7 +4,7 @@ struct MockData {
     
     static let pet = Pet(
         id: UUID(),
-        name: "Pixel",
+        name: "Mogee",
         species: "Cat",
         breed: "Calico",
         level: 12,
@@ -12,7 +12,7 @@ struct MockData {
         maxExperience: 1000,
         health: 0.85,
         happiness: 0.95,
-        imageURL: "https://api.dicebear.com/7.x/bottts/svg?seed=Pixel"
+        imageURL: "https://api.dicebear.com/7.x/bottts/svg?seed=Mogee"
     )
     
     static let launcherItems: [LauncherItem] = [
@@ -25,7 +25,7 @@ struct MockData {
     ]
     
     static let diaryEntries: [DiaryEntry] = [
-        DiaryEntry(id: UUID(), date: Date(), title: "Sunshine Nap", content: "Pixel found a perfect sunbeam today. Slept for 3 hours straight.", mood: "☀️", imageURLs: []),
+        DiaryEntry(id: UUID(), date: Date(), title: "Sunshine Nap", content: "Found a perfect sunbeam today. Slept for 3 hours straight.", mood: "☀️", imageURLs: []),
         DiaryEntry(id: UUID(), date: Date().addingTimeInterval(-86400), title: "The Red Dot Returns", content: "The laser pointer made a guest appearance. Much chaos ensued.", mood: "🔴", imageURLs: []),
         DiaryEntry(id: UUID(), date: Date().addingTimeInterval(-172800), title: "New Treat Alert", content: "Tried the tuna-flavored crunchies. Immediate hit.", mood: "🐟", imageURLs: []),
         DiaryEntry(id: UUID(), date: Date().addingTimeInterval(-259200), title: "Vet Visit", content: "Not the happiest day, but she was a brave girl.", mood: "🏥", imageURLs: []),
@@ -36,7 +36,7 @@ struct MockData {
         PetPhoto(
             id: UUID(),
             url: "https://picsum.photos/seed/pet\(i)/400/400",
-            caption: "Pixel moment #\(i)",
+            caption: "Pet moment #\(i)",
             date: Date().addingTimeInterval(Double(-i * 3600)),
             isFavorite: i % 3 == 0
         )

@@ -24,8 +24,8 @@ struct SettingsView: View {
                     VStack(spacing: DesignTokens.Spacing.l) {
                         // Profile Card
                         VStack(spacing: DesignTokens.Spacing.m) {
-                            PetAvatarBadgeView(pet: MockData.pet, size: 80)
-                            Text("Pixel's Parent")
+                            PetAvatarBadgeView(pet: currentPet, size: 80)
+                            Text("\(router.petName)'s Parent")
                                 .font(DesignTokens.Typography.headline)
                             Text("parent@example.com")
                                 .font(DesignTokens.Typography.body)
@@ -98,6 +98,12 @@ struct SettingsView: View {
             Text(activeNotice ?? "")
         }
         .navigationBarHidden(true)
+    }
+
+    private var currentPet: Pet {
+        var pet = MockData.pet
+        pet.name = router.petName
+        return pet
     }
     
     private func handleTap(for item: SettingItem) {

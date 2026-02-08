@@ -212,7 +212,7 @@ struct PetPhotosView: View {
             do {
                 guard let data = try await newItem.loadTransferable(type: Data.self),
                       let image = UIImage(data: data),
-                      let jpegData = image.jpegData(compressionQuality: 0.9)
+                      let jpegData = optimizedJPEGData(from: image, maxDimension: 1400, maxBytes: 450_000)
                 else {
                     throw NSError(
                         domain: "PetPhotos",
@@ -232,6 +232,50 @@ struct PetPhotosView: View {
             } catch {
                 pickerError = error.localizedDescription
             }
+        }
+    }
+
+    private func optimizedJPEGData(from image: UIImage, maxDimension: CGFloat, maxBytes: Int) -> Data? {
+        var candidate = resizedImage(image, maxDimension: maxDimension)
+        let qualitySteps: [CGFloat] = [0.84, 0.72, 0.62, 0.5, 0.4, 0.3, 0.24]
+
+        for _ in 0..<5 {
+            for quality in qualitySteps {
+                guard let data = candidate.jpegData(compressionQuality: quality) else { continue }
+                if data.count <= maxBytes {
+                    return data
+                }
+            }
+
+            let longestSide = max(candidate.size.width, candidate.size.height)
+            guard longestSide > 420 else { break }
+
+            let nextMaxDimension = max(longestSide * 0.84, 420)
+            candidate = resizedImage(candidate, maxDimension: nextMaxDimension)
+        }
+
+        guard let fallback = candidate.jpegData(compressionQuality: 0.2) else { return nil }
+        return fallback.count <= maxBytes ? fallback : nil
+    }
+
+    private func resizedImage(_ image: UIImage, maxDimension: CGFloat) -> UIImage {
+        let originalSize = image.size
+        let longestSide = max(originalSize.width, originalSize.height)
+        guard longestSide > maxDimension else { return image }
+
+        let scale = maxDimension / longestSide
+        let targetSize = CGSize(
+            width: max(1, floor(originalSize.width * scale)),
+            height: max(1, floor(originalSize.height * scale))
+        )
+
+        let format = UIGraphicsImageRendererFormat.default()
+        format.opaque = true
+        format.scale = 1
+
+        let renderer = UIGraphicsImageRenderer(size: targetSize, format: format)
+        return renderer.image { _ in
+            image.draw(in: CGRect(origin: .zero, size: targetSize))
         }
     }
 

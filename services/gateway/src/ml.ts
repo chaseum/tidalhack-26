@@ -39,6 +39,6 @@ export const mlChat = async (body: unknown): Promise<unknown> => {
       },
       body: JSON.stringify(body)
     },
-    config.REQUEST_TIMEOUT_MS
+    config.CHAT_REQUEST_TIMEOUT_MS
   );
 };
