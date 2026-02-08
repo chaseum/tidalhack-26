@@ -1,7 +1,9 @@
+import { loadRootEnv } from '../config/loadRootEnv';
 import { connectToMongo, disconnectMongo, getMongoUri } from '../db/connection';
 import { allModels } from '../db/models';
 
 async function main() {
+  loadRootEnv();
   await connectToMongo();
 
   for (const dbModel of allModels) {

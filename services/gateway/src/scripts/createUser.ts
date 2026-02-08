@@ -1,3 +1,4 @@
+import { loadRootEnv } from '../config/loadRootEnv';
 import { connectToMongo, disconnectMongo } from '../db/connection';
 import { UserModel } from '../db/models';
 import { hashPassword } from '../db/password';
@@ -9,6 +10,8 @@ function readArg(name: string): string | undefined {
 }
 
 async function main() {
+  loadRootEnv();
+
   const email = readArg('email');
   const password = readArg('password');
   const displayName = readArg('name');
