@@ -27,7 +27,7 @@ const parseBoolean = (value: string | undefined, fallback: boolean): boolean => 
 };
 
 export const config = {
-  PORT: parseNumber(process.env.PORT, 3000),
+  PORT: parseNumber(process.env.PORT, 8000),
   ML_BASE_URL: process.env.ML_BASE_URL ?? "http://localhost:8000",
   REQUEST_TIMEOUT_MS: parseNumber(process.env.REQUEST_TIMEOUT_MS, 8000),
   DEBUG: parseBoolean(process.env.DEBUG, false)
