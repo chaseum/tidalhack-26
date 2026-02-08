@@ -1,9 +1,9 @@
 import { createServer } from "./server";
+import { config } from "./env";
 
-const port = Number(process.env.PORT ?? 8080);
 const app = createServer();
 
-app.listen(port, () => {
+app.listen(config.PORT, () => {
   // eslint-disable-next-line no-console
-  console.log(`gateway listening on ${port}`);
+  console.log(`gateway listening on ${config.PORT}`);
 });
