@@ -7,7 +7,24 @@ struct AppRootView: View {
         NavigationStack(path: $router.path) {
             Group {
                 if router.isAuthenticated {
-                    HomeLauncherView()
+                    Group {
+                        switch router.currentTab {
+                        case .home:
+                            HomeLauncherView()
+                        case .diary:
+                            PetDiaryView()
+                        case .community:
+                            CommunityChatView()
+                        case .health:
+                            HealthStatusView()
+                        case .settings:
+                            SettingsView()
+                        default:
+                            HomeLauncherView()
+                        }
+                    }
+                    .transition(.opacity)
+                    .animation(.easeInOut, value: router.currentTab)
                 } else {
                     LoginView()
                 }
@@ -31,7 +48,7 @@ struct AppRootView: View {
                 }
             }
         }
-        .animation(.default, value: router.path)
+        .animation(.spring(response: 0.6, dampingFraction: 0.8), value: router.path)
         .preferredColorScheme(.light)
         .environmentObject(router)
     }

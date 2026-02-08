@@ -45,9 +45,11 @@ struct LoginView: View {
                     }
 
                     Button {
-                        router.login()
+                        Task {
+                            await router.login(email: email, password: password)
+                        }
                     } label: {
-                        Text("Enter PocketPaws")
+                        Text(router.isAuthenticating ? "Signing In..." : "Enter PocketPaws")
                             .font(.system(size: 18, weight: .black, design: .rounded))
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
@@ -62,8 +64,14 @@ struct LoginView: View {
                             .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
                     }
                     .buttonStyle(.plain)
-                    .disabled(!canLogin)
-                    .opacity(canLogin ? 1 : 0.6)
+                    .disabled(!canLogin || router.isAuthenticating)
+                    .opacity(canLogin && !router.isAuthenticating ? 1 : 0.6)
+
+                    if let authError = router.authError {
+                        Text(authError)
+                            .font(DesignTokens.Typography.caption)
+                            .foregroundColor(.red)
+                    }
                 }
                 .petPalCard(radius: 28, shadow: true)
                 .padding(.horizontal, DesignTokens.Spacing.l)
@@ -90,6 +98,7 @@ struct LoginView: View {
             withAnimation(.spring(response: 0.48, dampingFraction: 0.86)) {
                 didAppear = true
             }
+            router.clearAuthError()
         }
         .navigationBarHidden(true)
     }

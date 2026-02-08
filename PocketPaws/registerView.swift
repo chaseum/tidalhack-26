@@ -65,9 +65,11 @@ struct RegisterView: View {
                     }
 
                     Button {
-                        router.login()
+                        Task {
+                            await router.register(displayName: name, email: email, password: password)
+                        }
                     } label: {
-                        Text("Create Account")
+                        Text(router.isAuthenticating ? "Creating..." : "Create Account")
                             .font(.system(size: 18, weight: .black, design: .rounded))
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
@@ -82,8 +84,14 @@ struct RegisterView: View {
                             .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
                     }
                     .buttonStyle(.plain)
-                    .disabled(!canCreateAccount)
-                    .opacity(canCreateAccount ? 1 : 0.6)
+                    .disabled(!canCreateAccount || router.isAuthenticating)
+                    .opacity(canCreateAccount && !router.isAuthenticating ? 1 : 0.6)
+
+                    if let authError = router.authError {
+                        Text(authError)
+                            .font(DesignTokens.Typography.caption)
+                            .foregroundColor(.red)
+                    }
                 }
                 .petPalCard(radius: 28, shadow: true)
                 .padding(.horizontal, DesignTokens.Spacing.l)
@@ -98,6 +106,7 @@ struct RegisterView: View {
             withAnimation(.spring(response: 0.48, dampingFraction: 0.86)) {
                 didAppear = true
             }
+            router.clearAuthError()
         }
         .navigationBarHidden(true)
     }

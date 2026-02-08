@@ -1,7 +1,8 @@
 import express, { type Request, type Response } from 'express';
 import { sendError } from "./error-response";
-import { errorHandler } from "./errors";
-import { requestLogger } from "./logger";
+import { errorHandler } from "./middleware/errors";
+import { requestLogger } from "./middleware/logger";
+import { rateLimit } from "./middleware/ratelimit";
 import { assessRouter } from './routes/assess';
 import { authRouter } from './routes/auth';
 import { chatRouter } from './routes/chat';
@@ -14,6 +15,7 @@ export function createServer() {
   const app = express();
 
   app.use(requestLogger);
+  app.use(rateLimit);
   app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');

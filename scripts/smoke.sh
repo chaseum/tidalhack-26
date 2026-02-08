@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-GATEWAY_URL="${GATEWAY_URL:-http://127.0.0.1:3000}"
+GATEWAY_URL="${GATEWAY_URL:-http://127.0.0.1:8080}"
 ML_URL="${ML_URL:-http://127.0.0.1:8000}"
 IMAGE_PATH="${1:-${IMAGE_PATH:-}}"
 

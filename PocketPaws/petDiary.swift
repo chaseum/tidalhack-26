@@ -28,6 +28,9 @@ struct PetDiaryView: View {
                     }
                     Text("Pet Diary")
                         .font(DesignTokens.Typography.headline)
+                    Text(todayLabel)
+                        .font(DesignTokens.Typography.caption)
+                        .foregroundColor(DesignTokens.Colors.textSecondary)
                     Spacer()
                     CircularIconButton(icon: "plus") {
                         showingAddEntry = true
@@ -116,6 +119,12 @@ struct PetDiaryView: View {
             .presentationDetents([.medium, .large])
         }
         .navigationBarHidden(true)
+    }
+
+    private var todayLabel: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEE, MMM d"
+        return formatter.string(from: Date()).uppercased()
     }
     
     private func resetDraftEntry() {

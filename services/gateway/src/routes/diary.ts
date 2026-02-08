@@ -2,9 +2,11 @@ import { Router } from 'express';
 import { Types } from 'mongoose';
 import { z } from 'zod';
 import { DiaryEntryModel, PetProfileModel } from '../db/models';
+import { getUserObjectId, requireUserId } from '../middleware/auth';
 import { validateBody } from '../middleware/validate';
 
 export const diaryRouter = Router();
+diaryRouter.use(requireUserId);
 
 const diaryTypes = [
   'Walk',
@@ -29,11 +31,6 @@ const createDiaryEntrySchema = z.object({
   tags: z.array(z.string()).optional(),
 });
 
-function getUserObjectId(headerValue: string | undefined) {
-  if (!headerValue || !Types.ObjectId.isValid(headerValue)) return null;
-  return new Types.ObjectId(headerValue);
-}
-
 async function resolvePetForUser(userObjectId: Types.ObjectId, petId?: string) {
   if (petId && Types.ObjectId.isValid(petId)) {
     const existing = await PetProfileModel.findOne({
@@ -57,10 +54,7 @@ async function resolvePetForUser(userObjectId: Types.ObjectId, petId?: string) {
 
 diaryRouter.get('/', async (req, res) => {
   try {
-    const userObjectId = getUserObjectId(req.header('x-user-id'));
-    if (!userObjectId) {
-      return res.status(401).json({ error: 'MissingUserId' });
-    }
+    const userObjectId = getUserObjectId(res);
 
     const petId = typeof req.query.petId === 'string' ? req.query.petId : undefined;
     const pet = await resolvePetForUser(userObjectId, petId);
@@ -97,10 +91,7 @@ diaryRouter.get('/', async (req, res) => {
 
 diaryRouter.post('/', validateBody(createDiaryEntrySchema), async (req, res) => {
   try {
-    const userObjectId = getUserObjectId(req.header('x-user-id'));
-    if (!userObjectId) {
-      return res.status(401).json({ error: 'MissingUserId' });
-    }
+    const userObjectId = getUserObjectId(res);
 
     const pet = await resolvePetForUser(userObjectId, req.body.petId);
     const happenedAt = req.body.date ? new Date(req.body.date) : new Date();

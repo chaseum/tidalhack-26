@@ -61,7 +61,7 @@ struct PetAvatarBadgeView: View {
             .clipShape(Circle())
             .overlay(Circle().stroke(Color.white.opacity(0.9), lineWidth: 4))
             .overlay(Circle().stroke(DesignTokens.Colors.border, lineWidth: 1))
-            .shadow(color: Color.black.opacity(0.16), radius: 10, x: 0, y: 5)
+            .shadow(color: Color.black.opacity(0.1), radius: 15, x: 0, y: 3)
 
             LevelChip(level: pet.level)
                 .offset(x: 10, y: 4)
@@ -132,7 +132,7 @@ struct PrimaryCircleButton: View {
                         )
                 )
                 .overlay(Circle().stroke(Color.white.opacity(0.65), lineWidth: 2))
-                .shadow(color: Color.black.opacity(0.2), radius: 9, x: 0, y: 5)
+                .shadow(color: Color.black.opacity(0.15), radius: 12, x: 0, y: 3)
         }
         .buttonStyle(.plain)
     }
@@ -174,7 +174,7 @@ struct CircularAppButton: View {
                         RoundedRectangle(cornerRadius: 22, style: .continuous)
                             .stroke(Color.white.opacity(0.55), lineWidth: 2)
                     )
-                    .shadow(color: baseColor.opacity(0.32), radius: 10, x: 0, y: 6)
+                    .shadow(color: baseColor.opacity(0.2), radius: 15, x: 0, y: 4)
 
                 Text(item.title)
                     .font(.system(size: 13, weight: .bold, design: .rounded))
@@ -199,7 +199,7 @@ struct BottomNavBar: View {
                     RoundedRectangle(cornerRadius: 36, style: .continuous)
                         .stroke(Color.white.opacity(0.65), lineWidth: 1.5)
                 )
-                .shadow(color: Color.black.opacity(0.13), radius: 16, x: 0, y: 8)
+                .shadow(color: Color.black.opacity(0.1), radius: 20, x: 0, y: 5)
 
             HStack(spacing: 8) {
                 navItem(.diary)
@@ -229,7 +229,7 @@ struct BottomNavBar: View {
                             )
                     )
                     .overlay(Circle().stroke(Color.white.opacity(0.7), lineWidth: 2))
-                    .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 4)
+                    .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 2)
             }
             .buttonStyle(.plain)
             .offset(y: -22)

@@ -26,10 +26,10 @@ struct PetPalCard: ViewModifier {
                     .stroke(DesignTokens.Colors.border, lineWidth: 1)
             )
             .shadow(
-                color: Color.black.opacity(shadow ? 0.12 : 0.07),
-                radius: shadow ? 14 : 8,
+                color: Color.black.opacity(shadow ? 0.1 : 0.05),
+                radius: shadow ? 20 : 10,
                 x: 0,
-                y: shadow ? 10 : 4
+                y: shadow ? 5 : 2
             )
     }
 }
@@ -98,7 +98,7 @@ struct CircularIconButton: View {
                     Circle()
                         .stroke(Color.white.opacity(0.65), lineWidth: 2)
                 )
-                .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 4)
+                .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 2)
         }
         .buttonStyle(.plain)
     }

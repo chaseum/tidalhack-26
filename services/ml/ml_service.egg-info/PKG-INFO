@@ -9,6 +9,7 @@ Requires-Dist: openai<2.0.0,>=1.0.0
 Requires-Dist: pillow<12.0.0,>=10.0.0
 Requires-Dist: pydantic<3.0.0,>=2.6.0
 Requires-Dist: python-multipart<1.0.0,>=0.0.9
+Requires-Dist: tqdm<5.0.0,>=4.66.0
 Requires-Dist: torch<3.0.0,>=2.2.0
 Requires-Dist: uvicorn<1.0.0,>=0.27.0
 Provides-Extra: dev

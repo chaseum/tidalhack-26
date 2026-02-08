@@ -4,9 +4,11 @@ import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { Types } from 'mongoose';
 import { z } from 'zod';
 import { PetProfileModel, PhotoAssetModel } from '../db/models';
+import { getUserObjectId, requireUserId } from '../middleware/auth';
 import { validateBody } from '../middleware/validate';
 
 export const photosRouter = Router();
+photosRouter.use(requireUserId);
 
 const uploadPhotoSchema = z.object({
   petId: z.string().optional(),
@@ -23,11 +25,6 @@ function getRequiredEnv(name: string): string {
     throw new Error(`Missing required env: ${name}`);
   }
   return value;
-}
-
-function getUserObjectId(headerValue: string | undefined) {
-  if (!headerValue || !Types.ObjectId.isValid(headerValue)) return null;
-  return new Types.ObjectId(headerValue);
 }
 
 async function resolvePetForUser(userObjectId: Types.ObjectId, petId?: string) {
@@ -70,10 +67,7 @@ function createS3Client(region: string) {
 
 photosRouter.get('/', async (req, res) => {
   try {
-    const userObjectId = getUserObjectId(req.header('x-user-id'));
-    if (!userObjectId) {
-      return res.status(401).json({ error: 'MissingUserId' });
-    }
+    const userObjectId = getUserObjectId(res);
 
     const pet = await resolvePetForUser(userObjectId, typeof req.query.petId === 'string' ? req.query.petId : undefined);
 
@@ -113,10 +107,7 @@ photosRouter.get('/', async (req, res) => {
 
 photosRouter.post('/upload', validateBody(uploadPhotoSchema), async (req, res) => {
   try {
-    const userObjectId = getUserObjectId(req.header('x-user-id'));
-    if (!userObjectId) {
-      return res.status(401).json({ error: 'MissingUserId' });
-    }
+    const userObjectId = getUserObjectId(res);
 
     const mimeType = req.body.mimeType.toLowerCase();
     if (mimeType !== 'image/jpeg' && mimeType !== 'image/jpg') {

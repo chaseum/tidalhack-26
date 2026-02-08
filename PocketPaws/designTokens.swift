@@ -8,9 +8,12 @@ enum DesignTokens {
     // MARK: - Colors
     struct Colors {
         static let backgroundGradient = [
-            Color(hex: "#8FD6E8"),
-            Color(hex: "#9DDD94"),
-            Color(hex: "#F8EDD4")
+            Color(hex: "#E0F7FA"),
+            Color(hex: "#B2EBF2"),
+            Color(hex: "#80DEEA"),
+            Color(hex: "#4DD0E1"),
+            Color(hex: "#26C6DA"),
+            Color(hex: "#00BCD4")
         ]
         static let surface = Color(hex: "#FFFDF4")
         static let primary = Color(hex: "#4D8ECA")
@@ -55,6 +58,8 @@ enum DesignTokens {
         static let body = Font.system(size: 16, weight: .regular, design: .rounded)
         static let caption = Font.system(size: 12, weight: .semibold, design: .rounded)
         static let pixel = retro(size: 11, weight: .medium)
+        static let pixelTitle = retro(size: 24, weight: .bold)
+        static let pixelBody = retro(size: 14, weight: .regular)
         
         static let branding = Font.system(size: 28, weight: .heavy, design: .rounded)
         

@@ -5,7 +5,6 @@ struct HomeLauncherView: View {
     @State private var viewMode = "Overview"
     @State private var activeNotice: String?
 
-    @State private var showTitle = false
     @State private var showPetSpotlight = false
     @State private var showLauncher = false
     @State private var showProTip = false
@@ -28,7 +27,6 @@ struct HomeLauncherView: View {
 
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: DesignTokens.Spacing.l) {
-                        titleBubble
                         petSpotlight
 
                         PetPalSelector(items: ["Overview", "Stats"], selection: $viewMode)
@@ -63,23 +61,18 @@ struct HomeLauncherView: View {
         .onAppear {
             router.currentTab = .home
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-                    showTitle = true
-                }
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
                     showPetSpotlight = true
                 }
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-                withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) {
+                withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
                     showLauncher = true
                 }
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+                withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
                     showProTip = true
                 }
             }
@@ -121,27 +114,6 @@ struct HomeLauncherView: View {
         .padding(.bottom, DesignTokens.Spacing.s)
     }
 
-    private var titleBubble: some View {
-        Text("The PocketPaws\nCompanion")
-            .font(DesignTokens.Typography.branding)
-            .foregroundColor(DesignTokens.Colors.textPrimary)
-            .multilineTextAlignment(.center)
-            .padding(.horizontal, 24)
-            .padding(.vertical, 16)
-            .frame(maxWidth: .infinity)
-            .background(
-                RoundedRectangle(cornerRadius: 34, style: .continuous)
-                    .fill(DesignTokens.Colors.surface)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 34, style: .continuous)
-                            .stroke(DesignTokens.Colors.border, lineWidth: 1)
-                    )
-                    .shadow(color: Color.black.opacity(0.1), radius: 12, x: 0, y: 6)
-            )
-            .opacity(showTitle ? 1 : 0)
-            .offset(y: showTitle ? 0 : 20)
-    }
-
     private var petSpotlight: some View {
         VStack(alignment: .leading, spacing: DesignTokens.Spacing.m) {
             HStack(spacing: DesignTokens.Spacing.m) {
@@ -171,17 +143,6 @@ struct HomeLauncherView: View {
 
             ProgressView(value: Double(pet.experience), total: Double(pet.maxExperience))
                 .tint(DesignTokens.Colors.primary)
-
-            Text(todayLabel)
-                .font(DesignTokens.Typography.pixel)
-                .foregroundColor(.white)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
-                .background(
-                    Capsule()
-                        .fill(DesignTokens.Colors.secondary)
-                )
-                .frame(maxWidth: .infinity, alignment: .center)
         }
         .padding(DesignTokens.Spacing.m)
         .background(
@@ -223,7 +184,7 @@ struct HomeLauncherView: View {
             VStack(alignment: .leading, spacing: 5) {
                 Text("Pro Tip")
                     .font(DesignTokens.Typography.headline)
-                Text("Add one photo a day and your pet mood stays maxed.")
+                TypewriterView(text: "Add one photo a day and your pet mood stays maxed.")
                     .font(DesignTokens.Typography.body)
                     .foregroundColor(DesignTokens.Colors.textSecondary)
             }
@@ -278,6 +239,7 @@ struct HomeLauncherView: View {
             }
             ProgressView(value: pet.health)
                 .tint(.red)
+                .scaleEffect(x: 1, y: 8, anchor: .center)
 
             HStack {
                 Label("Happiness", systemImage: "face.smiling.fill")
@@ -288,14 +250,9 @@ struct HomeLauncherView: View {
             }
             ProgressView(value: pet.happiness)
                 .tint(.yellow)
+                .scaleEffect(x: 1, y: 8, anchor: .center)
         }
         .petPalCard(radius: DesignTokens.Radius.l)
-    }
-
-    private var todayLabel: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "EEE, MMM d"
-        return formatter.string(from: Date()).uppercased()
     }
 
     private func statusText(for value: Double) -> String {
@@ -317,17 +274,50 @@ struct HomeLauncherView: View {
     private func statRow(title: String, value: String) -> some View {
         HStack {
             Text(title)
-                .font(DesignTokens.Typography.body)
+                .font(DesignTokens.Typography.pixelBody)
                 .foregroundColor(DesignTokens.Colors.textSecondary)
             Spacer()
             Text(value)
-                .font(DesignTokens.Typography.body)
+                .font(DesignTokens.Typography.pixelBody)
                 .foregroundColor(DesignTokens.Colors.textPrimary)
         }
     }
 }
 
-struct HomeLauncherView_Preview: PreviewProvider {
+
+
+struct TypewriterView: View {
+    let text: String
+    @State private var displayedText = ""
+    @State private var timer: Timer?
+
+    var body: some View {
+        Text(displayedText)
+            .onAppear(perform: startAnimation)
+            .onDisappear(perform: stopAnimation)
+    }
+
+    private func startAnimation() {
+        var charIndex = 0
+        timer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { timer in
+            if charIndex < text.count {
+                let index = text.index(text.startIndex, offsetBy: charIndex)
+                displayedText.append(text[index])
+                charIndex += 1
+            } else {
+                timer.invalidate()
+            }
+        }
+    }
+
+    private func stopAnimation() {
+        timer?.invalidate()
+        timer = nil
+    }
+}
+
+struct HomeLauncherView_Preview: PreviewProvider
+ {
     static var previews: some View {
         HomeLauncherView().environmentObject(Router())
     }

@@ -27,8 +27,9 @@ const parseBoolean = (value: string | undefined, fallback: boolean): boolean => 
 };
 
 export const config = {
-  PORT: parseNumber(process.env.PORT, 8000),
-  ML_BASE_URL: process.env.ML_BASE_URL ?? "http://localhost:8000",
+  PORT: parseNumber(process.env.PORT ?? process.env.GATEWAY_PORT, 8080),
+  ML_BASE_URL: process.env.ML_BASE_URL ?? "http://127.0.0.1:8000",
+  RATE_LIMIT_RPM: parseNumber(process.env.RATE_LIMIT_RPM, 60),
   REQUEST_TIMEOUT_MS: parseNumber(process.env.REQUEST_TIMEOUT_MS, 8000),
   DEBUG: parseBoolean(process.env.DEBUG, false)
 };
