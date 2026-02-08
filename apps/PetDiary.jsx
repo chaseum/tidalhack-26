@@ -1,6 +1,7 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import BottomNav from './BottomNav';
 import { useApp } from './AppContext';
+import { createDiaryEntry, fetchDiaryEntries } from './apiClient';
 
 const entryTypes = [
   'Walk',
@@ -10,49 +11,108 @@ const entryTypes = [
   'Medication',
   'Nutrition',
   'Grooming',
-  'Mood Check',
+  'Symptom',
+  'Behavior',
+  'Vaccination',
   'Other',
 ];
 
 function PetDiaryPage() {
   const {
-    state: { petProfile, diaryEntries },
+    state: { petProfile },
     actions,
   } = useApp();
 
+  const [petId, setPetId] = useState('');
   const [type, setType] = useState('Walk');
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
   const [notes, setNotes] = useState('');
   const [query, setQuery] = useState('');
+  const [entries, setEntries] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
+
+  const loadDiary = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const payload = await fetchDiaryEntries({ petId: petId || undefined });
+      const fetchedEntries = Array.isArray(payload.entries) ? payload.entries : [];
+      setEntries(fetchedEntries);
+
+      if (payload.pet?.id) {
+        setPetId(payload.pet.id);
+      }
+      if (payload.pet?.name || payload.pet?.species) {
+        actions.updatePetProfile({
+          name: payload.pet?.name || petProfile.name,
+          species: payload.pet?.species || petProfile.species,
+        });
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Could not load diary entries.';
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadDiary();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const filteredEntries = useMemo(() => {
-    if (!query.trim()) return diaryEntries;
+    if (!query.trim()) return entries;
     const term = query.toLowerCase();
-    return diaryEntries.filter(
+    return entries.filter(
       (entry) =>
-        entry.type.toLowerCase().includes(term) ||
-        entry.notes.toLowerCase().includes(term) ||
-        entry.date.includes(term)
+        String(entry.type || '')?.toLowerCase().includes(term) ||
+        String(entry.notes || '')?.toLowerCase().includes(term) ||
+        String(entry.date || '').includes(term)
     );
-  }, [diaryEntries, query]);
+  }, [entries, query]);
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     if (!notes.trim()) return;
 
-    actions.addDiaryEntry({
-      type,
-      date,
-      notes: notes.trim(),
-    });
+    setSubmitting(true);
+    setError('');
+    try {
+      const payload = await createDiaryEntry({
+        petId: petId || undefined,
+        type,
+        date,
+        notes: notes.trim(),
+      });
 
-    setNotes('');
+      if (payload.pet?.id) {
+        setPetId(payload.pet.id);
+      }
+
+      if (payload.entry) {
+        setEntries((prev) => [payload.entry, ...prev]);
+      } else {
+        await loadDiary();
+      }
+
+      setNotes('');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Could not save diary entry.';
+      setError(message);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
     <main className="page-shell">
       <h1 className="page-header">Pet Diary</h1>
-      <p className="muted">Track every wellness event for {petProfile.name}: walks, baths, dental, vet, and more.</p>
+      <p className="muted">
+        Track every wellness event for {petProfile.name}: walks, baths, dental, vet, and more.
+      </p>
 
       <section className="grid-two">
         <article className="card">
@@ -90,8 +150,8 @@ function PetDiaryPage() {
               />
             </div>
 
-            <button className="button" type="submit">
-              Save Entry
+            <button className="button" type="submit" disabled={submitting}>
+              {submitting ? 'Saving...' : 'Save Entry'}
             </button>
           </form>
         </article>
@@ -108,8 +168,11 @@ function PetDiaryPage() {
             />
           </div>
 
+          {error && <p style={{ color: 'var(--danger)', marginTop: 0 }}>{error}</p>}
+          {loading && <p className="muted">Loading diary...</p>}
+
           <div className="diary-list">
-            {filteredEntries.length === 0 && <p className="muted">No matching entries yet.</p>}
+            {!loading && filteredEntries.length === 0 && <p className="muted">No matching entries yet.</p>}
             {filteredEntries.map((entry) => (
               <div className="diary-item" key={entry.id}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10 }}>

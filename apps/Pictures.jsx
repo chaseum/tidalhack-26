@@ -1,7 +1,8 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import BottomNav from './BottomNav';
 import { useApp } from './AppContext';
-import { readFileAsBase64, toDataUrl } from './imagePngTools';
+import { readFileAsBase64 } from './imagePngTools';
+import { fetchPhotos, uploadPhoto } from './apiClient';
 
 function getMonthGrid(referenceDate) {
   const year = referenceDate.getFullYear();
@@ -29,18 +30,52 @@ function getMonthGrid(referenceDate) {
 
 function PicturesPage() {
   const {
-    state: { photos },
+    state: { petProfile },
     actions,
   } = useApp();
 
+  const [petId, setPetId] = useState('');
+  const [photos, setPhotos] = useState([]);
   const [caption, setCaption] = useState('');
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
   const [error, setError] = useState('');
   const [monthCursor, setMonthCursor] = useState(new Date());
+  const [loading, setLoading] = useState(true);
+  const [uploading, setUploading] = useState(false);
+
+  const loadPhotos = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const payload = await fetchPhotos({ petId: petId || undefined });
+      setPhotos(Array.isArray(payload.photos) ? payload.photos : []);
+
+      if (payload.pet?.id) {
+        setPetId(payload.pet.id);
+      }
+      if (payload.pet?.name || payload.pet?.species) {
+        actions.updatePetProfile({
+          name: payload.pet?.name || petProfile.name,
+          species: payload.pet?.species || petProfile.species,
+        });
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Could not load photos.';
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadPhotos();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const photoCountByDate = useMemo(() => {
     return photos.reduce((acc, photo) => {
-      acc[photo.date] = (acc[photo.date] || 0) + 1;
+      const d = photo.date;
+      acc[d] = (acc[d] || 0) + 1;
       return acc;
     }, {});
   }, [photos]);
@@ -52,18 +87,39 @@ function PicturesPage() {
     if (!file) return;
 
     setError('');
+    setUploading(true);
+
     try {
+      if (!['image/jpeg', 'image/jpg'].includes(file.type.toLowerCase())) {
+        throw new Error('Only JPG images are allowed for S3 upload.');
+      }
+
       const raw = await readFileAsBase64(file);
-      actions.addPhoto({
-        dataUrl: toDataUrl(raw),
+      const payload = await uploadPhoto({
+        petId: petId || undefined,
+        fileName: file.name,
+        mimeType: raw.mimeType,
+        base64Data: raw.base64,
         caption: caption.trim(),
         date,
       });
+
+      if (payload.pet?.id) {
+        setPetId(payload.pet.id);
+      }
+
+      if (payload.photo) {
+        setPhotos((prev) => [payload.photo, ...prev]);
+      } else {
+        await loadPhotos();
+      }
+
       setCaption('');
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Could not upload image.';
       setError(message);
     } finally {
+      setUploading(false);
       event.target.value = '';
     }
   };
@@ -76,7 +132,7 @@ function PicturesPage() {
   return (
     <main className="page-shell">
       <h1 className="page-header">Pictures</h1>
-      <p className="muted">Upload pet photos and maintain a visual calendar of wellness changes.</p>
+      <p className="muted">Upload JPGs to S3 and store photo metadata in MongoDB.</p>
 
       <section className="grid-two">
         <article className="card stack">
@@ -102,11 +158,13 @@ function PicturesPage() {
           </div>
 
           <div>
-            <label htmlFor="photoUpload">Upload image</label>
-            <input id="photoUpload" type="file" accept="image/*" onChange={handleUpload} />
+            <label htmlFor="photoUpload">Upload JPG image</label>
+            <input id="photoUpload" type="file" accept=".jpg,.jpeg,image/jpeg" onChange={handleUpload} />
           </div>
 
           {error && <p style={{ color: 'var(--danger)', fontWeight: 700 }}>{error}</p>}
+          {loading && <p className="muted">Loading photos...</p>}
+          {uploading && <p className="muted">Uploading to S3...</p>}
 
           <h3 style={{ marginBottom: 6 }}>Photo calendar</h3>
           <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, alignItems: 'center' }}>
@@ -156,14 +214,15 @@ function PicturesPage() {
 
         <article className="card">
           <h2>Gallery</h2>
-          {photos.length === 0 && <p className="muted">No photos yet. Upload your first one.</p>}
+          {!loading && photos.length === 0 && <p className="muted">No photos yet. Upload your first JPG.</p>}
           <div className="photo-grid">
             {photos.map((photo) => (
               <figure key={photo.id} className="photo-tile" style={{ margin: 0 }}>
-                <img src={photo.dataUrl} alt={photo.caption || 'Pet upload'} />
+                <img src={photo.objectUrl} alt={photo.caption || photo.fileName || 'Pet upload'} />
                 <figcaption style={{ padding: 8 }}>
                   <div className="small muted">{photo.date}</div>
-                  <div>{photo.caption || 'No caption'}</div>
+                  <div>{photo.caption || photo.fileName || 'No caption'}</div>
+                  <div className="small muted">{photo.fileName}</div>
                 </figcaption>
               </figure>
             ))}

@@ -2,7 +2,7 @@
 .DS_Store
 
 # dataset
-oxford-iiit pet dataset/
+oxford-iiit pet dataset
 # Python
 __pycache__/
 *.py[cod]
@@ -14,17 +14,10 @@ htmlcov/
 .venv/
 venv/
 
-
+.env
+apps/.env
 # Node / JS
 node_modules/
+services/gateway/node_modules/
 dist/
-coverage/
-*.tsbuildinfo
-
-# Logs
-*.log
-
-# Local env/config
-.env
-.env.*
-node_modules
+services/gateway/dist/

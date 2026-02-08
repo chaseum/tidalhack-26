@@ -1,11 +1,32 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Navigate, Outlet, Route, Routes } from 'react-router-dom';
 import HomePage from './Home';
 import ChatPage from './Chat';
 import PicturesPage from './Pictures';
 import SettingsPage from './Settings';
 import PetDiaryPage from './PetDiary';
+import LoginPage from './Login';
+import RegisterPage from './Register';
 import { AppProvider, useApp } from './AppContext';
+
+function hasAuthToken() {
+  const token = localStorage.getItem('petapp_auth_token');
+  return Boolean(token && token.trim().length > 0);
+}
+
+function ProtectedRoute() {
+  if (!hasAuthToken()) {
+    return <Navigate to="/login" replace />;
+  }
+  return <Outlet />;
+}
+
+function PublicOnlyRoute() {
+  if (hasAuthToken()) {
+    return <Navigate to="/home" replace />;
+  }
+  return <Outlet />;
+}
 
 function ThemedRoutes() {
   const {
@@ -23,12 +44,21 @@ function ThemedRoutes() {
 
   return (
     <Routes>
-      <Route path="/" element={<HomePage />} />
-      <Route path="/home" element={<HomePage />} />
-      <Route path="/chat" element={<ChatPage />} />
-      <Route path="/pictures" element={<PicturesPage />} />
-      <Route path="/settings" element={<SettingsPage />} />
-      <Route path="/petdiary" element={<PetDiaryPage />} />
+      <Route element={<PublicOnlyRoute />}>
+        <Route path="/" element={<LoginPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+      </Route>
+
+      <Route element={<ProtectedRoute />}>
+        <Route path="/home" element={<HomePage />} />
+        <Route path="/chat" element={<ChatPage />} />
+        <Route path="/pictures" element={<PicturesPage />} />
+        <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/petdiary" element={<PetDiaryPage />} />
+      </Route>
+
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }

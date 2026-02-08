@@ -1,12 +1,20 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import BottomNav from './BottomNav';
 import { useApp } from './AppContext';
 
 function SettingsPage() {
+  const navigate = useNavigate();
   const {
     state: { settings, petProfile },
     actions,
   } = useApp();
+
+  const handleLogout = () => {
+    localStorage.removeItem('petapp_auth_token');
+    localStorage.removeItem('petapp_auth_user');
+    navigate('/login', { replace: true });
+  };
 
   return (
     <main className="page-shell">
@@ -92,6 +100,10 @@ function SettingsPage() {
 
           <button type="button" className="button ghost" onClick={() => actions.clearAllData()}>
             Reset Local App Data
+          </button>
+
+          <button type="button" className="button" onClick={handleLogout}>
+            Logout
           </button>
         </article>
       </section>

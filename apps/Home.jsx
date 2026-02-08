@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import BottomNav from './BottomNav';
 import cat from './images/cat.png';
 import { generatePixelArtFromAnimal } from './geminiPixelArt';
@@ -8,6 +8,7 @@ import {
   toDataUrl,
 } from './imagePngTools';
 import { useApp } from './AppContext';
+import { displayS3JpgByName } from './s3ImageViewer';
 
 function HomePage() {
   const fileInputRef = useRef(null);
@@ -23,6 +24,22 @@ function HomePage() {
   const [uploadedFileName, setUploadedFileName] = useState('');
   const [generatedDataUrl, setGeneratedDataUrl] = useState('');
   const [transparentDataUrl, setTransparentDataUrl] = useState('');
+  const [s3Status, setS3Status] = useState('Loading S3 image...');
+
+  useEffect(() => {
+    const region = import.meta.env.VITE_S3_REGION || 'us-west-2';
+    displayS3JpgByName({
+      bucket: 'tidal-user-information',
+      region,
+      Name: 'IMG_0265.jpg',
+      target: '#pet-photo',
+    })
+      .then(() => setS3Status('Loaded from S3'))
+      .catch((err) => {
+        const message = err instanceof Error ? err.message : 'Failed to load S3 image';
+        setS3Status(message);
+      });
+  }, []);
 
   const notifications = useMemo(() => {
     const hasRecentBath = diaryEntries.some((entry) => entry.type === 'Bath');
@@ -162,6 +179,14 @@ function HomePage() {
             <h3 style={{ marginBottom: 8 }}>Flavor Text</h3>
             <p className="muted" style={{ margin: 0 }}>
               "Consistency beats intensity. Small daily care rituals protect long-term health."
+            </p>
+          </div>
+
+          <div className="card" style={{ padding: 12 }}>
+            <h3 style={{ marginBottom: 8 }}>S3 Image Preview</h3>
+            <img id="pet-photo" className="pixel-preview" alt="S3 pet preview" />
+            <p className="small muted" style={{ marginBottom: 0 }}>
+              {s3Status}
             </p>
           </div>
         </article>
