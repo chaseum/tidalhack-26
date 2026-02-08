@@ -26,25 +26,38 @@ def get_client() -> OpenAI:
     return _client
 
 
-def _chat_once(model: str, messages: Sequence[dict[str, Any]]) -> str:
+def _chat_once(
+    model: str,
+    messages: Sequence[dict[str, Any]],
+    timeout_seconds: float | None = None,
+) -> str:
     response = get_client().chat.completions.create(
         model=model,
         messages=list(messages),
+        timeout=timeout_seconds,
     )
     content = response.choices[0].message.content
     return content if content is not None else ""
 
 
-def _chat_with_single_retry(model: str, messages: Sequence[dict[str, Any]]) -> str:
+def _chat_with_single_retry(
+    model: str,
+    messages: Sequence[dict[str, Any]],
+    timeout_seconds: float | None = None,
+) -> str:
     try:
-        return _chat_once(model=model, messages=messages)
+        return _chat_once(model=model, messages=messages, timeout_seconds=timeout_seconds)
     except (APIConnectionError, APITimeoutError):
-        return _chat_once(model=model, messages=messages)
+        return _chat_once(model=model, messages=messages, timeout_seconds=timeout_seconds)
 
 
 def vision_chat(messages: Sequence[dict[str, Any]]) -> str:
     return _chat_with_single_retry(model=VISION_MODEL, messages=messages)
 
 
-def text_chat(messages: Sequence[dict[str, Any]]) -> str:
-    return _chat_with_single_retry(model=CHAT_MODEL, messages=messages)
+def text_chat(messages: Sequence[dict[str, Any]], timeout_seconds: float | None = None) -> str:
+    return _chat_with_single_retry(
+        model=CHAT_MODEL,
+        messages=messages,
+        timeout_seconds=timeout_seconds,
+    )

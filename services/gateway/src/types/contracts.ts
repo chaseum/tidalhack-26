@@ -1,8 +1,8 @@
 export type {
   AssessRequest,
   AssessResponse,
+  PlanRequest,
+  PlanResponse,
   ChatRequest,
-  ChatResponse,
-  PredictRequest,
-  PredictResponse
+  ChatResponse
 } from "../validators/contracts";
