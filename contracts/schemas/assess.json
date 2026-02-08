@@ -1,65 +1,43 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Assessment Endpoint",
-  "description": "Schema for the /assess endpoint, which proxies /predict.",
+  "title": "Assessment",
+  "description": "Schema for assessment endpoint.",
   "type": "object",
   "properties": {
     "request": {
       "type": "object",
       "properties": {
-        "image_url": {
-          "type": "string",
-          "format": "uri"
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "data": { "type": "string" }
+            },
+            "required": ["id", "data"]
+          }
         }
       },
-      "required": ["image_url"]
+      "required": ["items"]
     },
     "response": {
       "type": "object",
       "properties": {
-        "scores": {
-          "type": "object",
-          "properties": {
-            "environmental": { "type": "number" },
-            "social": { "type": "number" },
-            "governance": { "type": "number" }
+        "results": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "assessment": { "type": "string" },
+              "score": { "type": "number" }
+            },
+            "required": ["id", "assessment", "score"]
           }
-        },
-        "confidence": {
-          "type": "number",
-          "minimum": 0,
-          "maximum": 1
         }
       },
-      "required": ["scores", "confidence"]
+      "required": ["results"]
     }
-  },
-  "examples": [
-    {
-      "request": {
-        "image_url": "https://example.com/image3.jpg"
-      },
-      "response": {
-        "scores": {
-          "environmental": 0.7,
-          "social": 0.5,
-          "governance": 0.8
-        },
-        "confidence": 0.82
-      }
-    },
-    {
-      "request": {
-        "image_url": "https://example.com/image4.png"
-      },
-      "response": {
-        "scores": {
-          "environmental": 0.6,
-          "social": 0.8,
-          "governance": 0.3
-        },
-        "confidence": 0.75
-      }
-    }
-  ]
+  }
 }
