@@ -2,7 +2,7 @@
 .DS_Store
 
 # dataset
-oxford-iiit pet dataset
+dataset/
 # Python
 __pycache__/
 *.py[cod]
