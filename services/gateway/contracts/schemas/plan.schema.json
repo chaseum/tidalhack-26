@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "services/gateway/contracts/schemas/plan.schema.json",
+  "title": "POST /plan Contract",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "request": {
+      "$ref": "#/$defs/PlanRequest"
+    },
+    "response": {
+      "$ref": "#/$defs/PlanResponse"
+    }
+  },
+  "required": [
+    "request",
+    "response"
+  ],
+  "$defs": {
+    "PlanRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "session_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "goal": {
+          "type": "string",
+          "minLength": 1
+        },
+        "constraints": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "default": []
+        },
+        "horizon_days": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 90,
+          "default": 30
+        }
+      },
+      "required": [
+        "session_id",
+        "goal"
+      ]
+    },
+    "PlanResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "session_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "plan": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "next_step": {
+          "type": "string",
+          "minLength": 1
+        },
+        "fallback_used": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "session_id",
+        "plan",
+        "next_step",
+        "fallback_used"
+      ]
+    }
+  }
+}

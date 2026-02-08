@@ -2,7 +2,7 @@
 .DS_Store
 
 # dataset
-oxford-iiit pet dataset
+oxford-iiit pet dataset/
 # Python
 __pycache__/
 *.py[cod]
@@ -13,6 +13,7 @@ __pycache__/
 htmlcov/
 .venv/
 venv/
+
 
 # Node / JS
 node_modules/

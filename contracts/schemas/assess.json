@@ -1,43 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Assessment",
-  "description": "Schema for assessment endpoint.",
-  "type": "object",
-  "properties": {
-    "request": {
-      "type": "object",
-      "properties": {
-        "items": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "id": { "type": "string" },
-              "data": { "type": "string" }
-            },
-            "required": ["id", "data"]
-          }
-        }
-      },
-      "required": ["items"]
-    },
-    "response": {
-      "type": "object",
-      "properties": {
-        "results": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "id": { "type": "string" },
-              "assessment": { "type": "string" },
-              "score": { "type": "number" }
-            },
-            "required": ["id", "assessment", "score"]
-          }
-        }
-      },
-      "required": ["results"]
-    }
-  }
+  "banner": "DEPRECATED: see docs/api.md",
+  "deprecated": true,
+  "replaced_by": "docs/api.md"
 }
