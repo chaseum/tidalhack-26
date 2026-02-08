@@ -6,6 +6,26 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		AB2D91F42F38DADA002A2CE8 /* loginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2D91EA2F38DADA002A2CE8 /* loginView.swift */; };
+		AB2D91F52F38DADA002A2CE8 /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2D91E42F38DADA002A2CE8 /* Components.swift */; };
+		AB2D91F62F38DADA002A2CE8 /* designTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2D91E52F38DADA002A2CE8 /* designTokens.swift */; };
+		AB2D91F72F38DADA002A2CE8 /* petPhotos.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2D91EE2F38DADA002A2CE8 /* petPhotos.swift */; };
+		AB2D91F82F38DADA002A2CE8 /* mockData.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2D91EB2F38DADA002A2CE8 /* mockData.swift */; };
+		AB2D91F92F38DADA002A2CE8 /* chatview.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2D91E22F38DADA002A2CE8 /* chatview.swift */; };
+		AB2D91FA2F38DADA002A2CE8 /* PocketPawsTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2D91F02F38DADA002A2CE8 /* PocketPawsTheme.swift */; };
+		AB2D91FB2F38DADA002A2CE8 /* router.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2D91F22F38DADA002A2CE8 /* router.swift */; };
+		AB2D91FC2F38DADA002A2CE8 /* homeLauncherview.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2D91E62F38DADA002A2CE8 /* homeLauncherview.swift */; };
+		AB2D91FD2F38DADA002A2CE8 /* settingsview.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2D91F32F38DADA002A2CE8 /* settingsview.swift */; };
+		AB2D91FE2F38DADA002A2CE8 /* registerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2D91F12F38DADA002A2CE8 /* registerView.swift */; };
+		AB2D91FF2F38DADA002A2CE8 /* models.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2D91EC2F38DADA002A2CE8 /* models.swift */; };
+		AB2D92002F38DADA002A2CE8 /* approotview.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2D91E12F38DADA002A2CE8 /* approotview.swift */; };
+		AB2D92012F38DADA002A2CE8 /* petDiary.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2D91ED2F38DADA002A2CE8 /* petDiary.swift */; };
+		AB2D92022F38DADA002A2CE8 /* color.json in Resources */ = {isa = PBXBuildFile; fileRef = AB2D91E32F38DADA002A2CE8 /* color.json */; };
+		AB2D92042F38DADA002A2CE8 /* index.html in Resources */ = {isa = PBXBuildFile; fileRef = AB2D91E72F38DADA002A2CE8 /* index.html */; };
+		AB2D92072F38DB4B002A2CE8 /* PocketPawsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2D92062F38DB48002A2CE8 /* PocketPawsApp.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		AB2D91502F38D690002A2CE8 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,24 +47,32 @@
 		AB2D913E2F38D68E002A2CE8 /* PocketPaws.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PocketPaws.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB2D914F2F38D690002A2CE8 /* PocketPawsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PocketPawsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB2D91592F38D690002A2CE8 /* PocketPawsUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PocketPawsUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		AB2D91E12F38DADA002A2CE8 /* approotview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = approotview.swift; sourceTree = "<group>"; };
+		AB2D91E22F38DADA002A2CE8 /* chatview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = chatview.swift; sourceTree = "<group>"; };
+		AB2D91E32F38DADA002A2CE8 /* color.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = color.json; sourceTree = "<group>"; };
+		AB2D91E42F38DADA002A2CE8 /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
+		AB2D91E52F38DADA002A2CE8 /* designTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = designTokens.swift; sourceTree = "<group>"; };
+		AB2D91E62F38DADA002A2CE8 /* homeLauncherview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = homeLauncherview.swift; sourceTree = "<group>"; };
+		AB2D91E72F38DADA002A2CE8 /* index.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = index.html; sourceTree = "<group>"; };
+		AB2D91E82F38DADA002A2CE8 /* index.tsx */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.typescript; path = index.tsx; sourceTree = "<group>"; };
+		AB2D91E92F38DADA002A2CE8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AB2D91EA2F38DADA002A2CE8 /* loginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = loginView.swift; sourceTree = "<group>"; };
+		AB2D91EB2F38DADA002A2CE8 /* mockData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = mockData.swift; sourceTree = "<group>"; };
+		AB2D91EC2F38DADA002A2CE8 /* models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = models.swift; sourceTree = "<group>"; };
+		AB2D91ED2F38DADA002A2CE8 /* petDiary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = petDiary.swift; sourceTree = "<group>"; };
+		AB2D91EE2F38DADA002A2CE8 /* petPhotos.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = petPhotos.swift; sourceTree = "<group>"; };
+		AB2D91EF2F38DADA002A2CE8 /* PocketPaws.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PocketPaws.entitlements; sourceTree = "<group>"; };
+		AB2D91F02F38DADA002A2CE8 /* PocketPawsTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PocketPawsTheme.swift; sourceTree = "<group>"; };
+		AB2D91F12F38DADA002A2CE8 /* registerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = registerView.swift; sourceTree = "<group>"; };
+		AB2D91F22F38DADA002A2CE8 /* router.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = router.swift; sourceTree = "<group>"; };
+		AB2D91F32F38DADA002A2CE8 /* settingsview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = settingsview.swift; sourceTree = "<group>"; };
+		AB2D92052F38DAE1002A2CE8 /* PocketPaws-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "PocketPaws-Bridging-Header.h"; sourceTree = "<group>"; };
+		AB2D92062F38DB48002A2CE8 /* PocketPawsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PocketPawsApp.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
-
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		AB2D91612F38D690002A2CE8 /* Exceptions for "PocketPaws" folder in "PocketPaws" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-			);
-			target = AB2D913D2F38D68E002A2CE8 /* PocketPaws */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		AB2D91402F38D68E002A2CE8 /* PocketPaws */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				AB2D91612F38D690002A2CE8 /* Exceptions for "PocketPaws" folder in "PocketPaws" target */,
-			);
 			path = PocketPaws;
 			sourceTree = "<group>";
 		};
@@ -88,10 +116,31 @@
 		AB2D91352F38D68E002A2CE8 = {
 			isa = PBXGroup;
 			children = (
+				AB2D92062F38DB48002A2CE8 /* PocketPawsApp.swift */,
+				AB2D91E12F38DADA002A2CE8 /* approotview.swift */,
+				AB2D91E22F38DADA002A2CE8 /* chatview.swift */,
+				AB2D91E32F38DADA002A2CE8 /* color.json */,
+				AB2D91E42F38DADA002A2CE8 /* Components.swift */,
+				AB2D91E52F38DADA002A2CE8 /* designTokens.swift */,
+				AB2D91E62F38DADA002A2CE8 /* homeLauncherview.swift */,
+				AB2D91E72F38DADA002A2CE8 /* index.html */,
+				AB2D91E82F38DADA002A2CE8 /* index.tsx */,
+				AB2D91E92F38DADA002A2CE8 /* Info.plist */,
+				AB2D91EA2F38DADA002A2CE8 /* loginView.swift */,
+				AB2D91EB2F38DADA002A2CE8 /* mockData.swift */,
+				AB2D91EC2F38DADA002A2CE8 /* models.swift */,
+				AB2D91ED2F38DADA002A2CE8 /* petDiary.swift */,
+				AB2D91EE2F38DADA002A2CE8 /* petPhotos.swift */,
+				AB2D91EF2F38DADA002A2CE8 /* PocketPaws.entitlements */,
+				AB2D91F02F38DADA002A2CE8 /* PocketPawsTheme.swift */,
+				AB2D91F12F38DADA002A2CE8 /* registerView.swift */,
+				AB2D91F22F38DADA002A2CE8 /* router.swift */,
+				AB2D91F32F38DADA002A2CE8 /* settingsview.swift */,
 				AB2D91402F38D68E002A2CE8 /* PocketPaws */,
 				AB2D91522F38D690002A2CE8 /* PocketPawsTests */,
 				AB2D915C2F38D690002A2CE8 /* PocketPawsUITests */,
 				AB2D913F2F38D68E002A2CE8 /* Products */,
+				AB2D92052F38DAE1002A2CE8 /* PocketPaws-Bridging-Header.h */,
 			);
 			sourceTree = "<group>";
 		};
@@ -188,6 +237,7 @@
 				TargetAttributes = {
 					AB2D913D2F38D68E002A2CE8 = {
 						CreatedOnToolsVersion = 26.2;
+						LastSwiftMigration = 2620;
 					};
 					AB2D914E2F38D690002A2CE8 = {
 						CreatedOnToolsVersion = 26.2;
@@ -225,6 +275,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AB2D92022F38DADA002A2CE8 /* color.json in Resources */,
+				AB2D92042F38DADA002A2CE8 /* index.html in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -249,6 +301,21 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AB2D91F42F38DADA002A2CE8 /* loginView.swift in Sources */,
+				AB2D92072F38DB4B002A2CE8 /* PocketPawsApp.swift in Sources */,
+				AB2D91F52F38DADA002A2CE8 /* Components.swift in Sources */,
+				AB2D91F62F38DADA002A2CE8 /* designTokens.swift in Sources */,
+				AB2D91F72F38DADA002A2CE8 /* petPhotos.swift in Sources */,
+				AB2D91F82F38DADA002A2CE8 /* mockData.swift in Sources */,
+				AB2D91F92F38DADA002A2CE8 /* chatview.swift in Sources */,
+				AB2D91FA2F38DADA002A2CE8 /* PocketPawsTheme.swift in Sources */,
+				AB2D91FB2F38DADA002A2CE8 /* router.swift in Sources */,
+				AB2D91FC2F38DADA002A2CE8 /* homeLauncherview.swift in Sources */,
+				AB2D91FD2F38DADA002A2CE8 /* settingsview.swift in Sources */,
+				AB2D91FE2F38DADA002A2CE8 /* registerView.swift in Sources */,
+				AB2D91FF2F38DADA002A2CE8 /* models.swift in Sources */,
+				AB2D92002F38DADA002A2CE8 /* approotview.swift in Sources */,
+				AB2D92012F38DADA002A2CE8 /* petDiary.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -287,13 +354,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = PocketPaws/PocketPaws.entitlements;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = "";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 8UHY8RA4R6;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = PocketPaws/Info.plist;
+				INFOPLIST_FILE = Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -310,6 +378,8 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "PocketPaws-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -321,13 +391,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = PocketPaws/PocketPaws.entitlements;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = "";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 8UHY8RA4R6;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = PocketPaws/Info.plist;
+				INFOPLIST_FILE = Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -344,6 +415,7 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "PocketPaws-Bridging-Header.h";
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

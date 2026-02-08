@@ -3,7 +3,7 @@ import SwiftUI
 // MARK: - Theme Modifiers
 struct PetPalCard: ViewModifier {
     var radius: CGFloat = DesignTokens.Radius.m
-    var shadow: Bool = true
+    var shadow: Bool = false
     
     func body(content: Content) -> some View {
         content
@@ -14,17 +14,12 @@ struct PetPalCard: ViewModifier {
                 RoundedRectangle(cornerRadius: radius)
                     .stroke(DesignTokens.Colors.border, lineWidth: 1)
             )
-            .shadow(
-                color: shadow ? Color.black.opacity(DesignTokens.Shadows.mediumOpacity) : .clear,
-                radius: DesignTokens.Shadows.mediumRadius,
-                x: DesignTokens.Shadows.mediumOffset.x,
-                y: DesignTokens.Shadows.mediumOffset.y
-            )
+            .shadow(color: .clear, radius: shadow ? 1 : 0, x: 0, y: 0)
     }
 }
 
 extension View {
-    func petPalCard(radius: CGFloat = DesignTokens.Radius.m, shadow: Bool = true) -> some View {
+    func petPalCard(radius: CGFloat = DesignTokens.Radius.m, shadow: Bool = false) -> some View {
         modifier(PetPalCard(radius: radius, shadow: shadow))
     }
 }
@@ -41,20 +36,6 @@ struct PetPalBackground: View {
     }
 }
 
-struct LevelChip: View {
-    let level: Int
-    
-    var body: some View {
-        Text("LVL \(level)")
-            .font(DesignTokens.Typography.caption)
-            .foregroundColor(.white)
-            .padding(.horizontal, DesignTokens.Spacing.s)
-            .padding(.vertical, DesignTokens.Spacing.xs)
-            .background(DesignTokens.Colors.secondary)
-            .clipShape(Capsule())
-    }
-}
-
 struct CircularIconButton: View {
     let icon: String
     let action: () -> Void
@@ -67,12 +48,7 @@ struct CircularIconButton: View {
                 .frame(width: 48, height: 48)
                 .background(DesignTokens.Colors.surface)
                 .clipShape(Circle())
-                .shadow(
-                    color: Color.black.opacity(DesignTokens.Shadows.softOpacity),
-                    radius: DesignTokens.Shadows.softRadius,
-                    x: DesignTokens.Shadows.softOffset.x,
-                    y: DesignTokens.Shadows.softOffset.y
-                )
+                .overlay(Circle().stroke(DesignTokens.Colors.border, lineWidth: 1))
         }
     }
 }

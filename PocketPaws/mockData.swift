@@ -18,7 +18,7 @@ struct MockData {
     static let launcherItems: [LauncherItem] = [
         LauncherItem(id: "1", title: "Diary", icon: "book.fill", destination: .diary, hexColor: "#97B476"),
         LauncherItem(id: "2", title: "Gallery", icon: "photo.on.rectangle", destination: .photos, hexColor: "#B199F9"),
-        LauncherItem(id: "3", title: "Chat", icon: "bubble.left.and.bubble.right.fill", destination: .community, hexColor: "#FF99C8"),
+        LauncherItem(id: "3", title: "Assistant", icon: "bubble.left.and.bubble.right.fill", destination: .community, hexColor: "#FF99C8"),
         LauncherItem(id: "4", title: "Health", icon: "heart.text.square.fill", destination: .health, hexColor: "#FFD666"),
         LauncherItem(id: "5", title: "Shop", icon: "bag.fill", destination: .shop, hexColor: "#7FB3D5"),
         LauncherItem(id: "6", title: "Settings", icon: "gearshape.fill", destination: .settings, hexColor: "#95A5A6")
@@ -43,18 +43,24 @@ struct MockData {
     }
     
     static let chatMessages: [ChatMessage] = [
-        ChatMessage(id: UUID(), senderId: "user2", senderName: "Sarah", text: "Has anyone tried the new organic kibble?", timestamp: Date().addingTimeInterval(-3600), isMine: false),
-        ChatMessage(id: UUID(), senderId: "me", senderName: "Me", text: "Yes! Pixel loves it, highly recommend.", timestamp: Date().addingTimeInterval(-3500), isMine: true),
-        ChatMessage(id: UUID(), senderId: "user3", senderName: "Tom", text: "Is it grain-free?", timestamp: Date().addingTimeInterval(-3400), isMine: false),
-        ChatMessage(id: UUID(), senderId: "user2", senderName: "Sarah", text: "Yes, it is.", timestamp: Date().addingTimeInterval(-3300), isMine: false),
-        ChatMessage(id: UUID(), senderId: "me", senderName: "Me", text: "Check the green bag at the shop.", timestamp: Date().addingTimeInterval(-3000), isMine: true),
-        ChatMessage(id: UUID(), senderId: "user4", senderName: "Luna", text: "Thanks for the tip!", timestamp: Date().addingTimeInterval(-2800), isMine: false),
-        ChatMessage(id: UUID(), senderId: "user4", senderName: "Luna", text: "My pup is very picky.", timestamp: Date().addingTimeInterval(-2750), isMine: false),
-        ChatMessage(id: UUID(), senderId: "me", senderName: "Me", text: "Mine too usually!", timestamp: Date().addingTimeInterval(-2600), isMine: true),
-        ChatMessage(id: UUID(), senderId: "user2", senderName: "Sarah", text: "Haha same here.", timestamp: Date().addingTimeInterval(-2000), isMine: false),
-        ChatMessage(id: UUID(), senderId: "user3", senderName: "Tom", text: "I'll grab some today.", timestamp: Date().addingTimeInterval(-1500), isMine: false),
-        ChatMessage(id: UUID(), senderId: "user5", senderName: "Felix", text: "Anyone want to do a park meet-up?", timestamp: Date().addingTimeInterval(-500), isMine: false),
-        ChatMessage(id: UUID(), senderId: "me", senderName: "Me", text: "Count us in for Saturday!", timestamp: Date().addingTimeInterval(-100), isMine: true)
+        ChatMessage(
+            id: UUID(),
+            senderId: "assistant",
+            senderName: "Mogee Guide",
+            text: "Hi, I can help with food, routines, symptoms to watch, and care plans. What do you want to check today?",
+            timestamp: Date(),
+            isMine: false
+        )
+    ]
+    
+    static let weeklyActivity: [WeeklyActivityDay] = [
+        WeeklyActivityDay(id: UUID(), dayLabel: "Mon", walkMinutes: 24, playMinutes: 18, mealsLogged: 3, mood: "Happy"),
+        WeeklyActivityDay(id: UUID(), dayLabel: "Tue", walkMinutes: 32, playMinutes: 25, mealsLogged: 3, mood: "Great"),
+        WeeklyActivityDay(id: UUID(), dayLabel: "Wed", walkMinutes: 16, playMinutes: 20, mealsLogged: 2, mood: "Calm"),
+        WeeklyActivityDay(id: UUID(), dayLabel: "Thu", walkMinutes: 29, playMinutes: 28, mealsLogged: 3, mood: "Great"),
+        WeeklyActivityDay(id: UUID(), dayLabel: "Fri", walkMinutes: 22, playMinutes: 15, mealsLogged: 3, mood: "Happy"),
+        WeeklyActivityDay(id: UUID(), dayLabel: "Sat", walkMinutes: 38, playMinutes: 31, mealsLogged: 3, mood: "Energetic"),
+        WeeklyActivityDay(id: UUID(), dayLabel: "Sun", walkMinutes: 27, playMinutes: 22, mealsLogged: 3, mood: "Happy")
     ]
     
     static let settings: [SettingsSection] = [

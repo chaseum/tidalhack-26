@@ -10,14 +10,17 @@ struct PetPalSelector: View {
         HStack(spacing: 6) {
             ForEach(items, id: \.self) { item in
                 Text(item)
-                    .font(.subheadline.weight(.semibold))
+                    .font(DesignTokens.Typography.caption)
                     .foregroundStyle(selection == item ? DesignTokens.Colors.textPrimary : DesignTokens.Colors.textSecondary)
                     .padding(.vertical, 8)
                     .frame(maxWidth: .infinity)
                     .background {
                         if selection == item {
                             Capsule()
-                                .fill(.ultraThinMaterial)
+                                .fill(DesignTokens.Colors.surface)
+                                .overlay(
+                                    Capsule().stroke(DesignTokens.Colors.border, lineWidth: 1)
+                                )
                                 .matchedGeometryEffect(id: "selectorBG", in: ns)
                         }
                     }
@@ -30,7 +33,8 @@ struct PetPalSelector: View {
             }
         }
         .padding(4)
-        .background(.thinMaterial, in: Capsule())
+        .background(DesignTokens.Colors.surface, in: Capsule())
+        .overlay(Capsule().stroke(DesignTokens.Colors.border, lineWidth: 1))
     }
 }
 
@@ -50,7 +54,7 @@ struct PetAvatarBadgeView: View {
             .frame(width: size, height: size)
             .clipShape(Circle())
             .overlay(Circle().stroke(DesignTokens.Colors.surface, lineWidth: 2))
-            .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+            .overlay(Circle().stroke(DesignTokens.Colors.border, lineWidth: 1))
             
             LevelChip(level: pet.level)
                 .offset(x: 10, y: 0)
@@ -107,7 +111,7 @@ struct PrimaryCircleButton: View {
                 .frame(width: 64, height: 64)
                 .background(DesignTokens.Colors.primary)
                 .clipShape(Circle())
-                .shadow(color: DesignTokens.Colors.primary.opacity(0.3), radius: 10, x: 0, y: 5)
+                .overlay(Circle().stroke(DesignTokens.Colors.border, lineWidth: 1))
         }
     }
 }
@@ -119,21 +123,23 @@ struct CircularAppButton: View {
     var body: some View {
         Button(action: action) {
             VStack(spacing: DesignTokens.Spacing.s) {
-                ZStack {
-                    Circle()
-                        .fill(DesignTokens.Colors.surface)
-                        .frame(width: 80, height: 80)
-                        .shadow(color: Color.black.opacity(0.05), radius: 10, x: 0, y: 5)
-                    
-                    Image(systemName: item.icon)
-                        .font(.system(size: 32))
-                        .foregroundColor(Color(hex: item.hexColor))
-                }
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .fill(Color(hex: item.hexColor).opacity(0.22))
+                    .overlay(
+                        Image(systemName: item.icon)
+                            .font(.system(size: 30, weight: .medium))
+                            .foregroundColor(Color(hex: item.hexColor))
+                    )
+                    .frame(width: 78, height: 78)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 18, style: .continuous)
+                            .stroke(Color(hex: item.hexColor).opacity(0.35), lineWidth: 1)
+                    )
                 
                 Text(item.title)
                     .font(DesignTokens.Typography.caption)
                     .foregroundColor(DesignTokens.Colors.textPrimary)
-                    .fontWeight(.semibold)
+                    .lineLimit(1)
             }
         }
     }
@@ -142,36 +148,82 @@ struct CircularAppButton: View {
 // MARK: - Navigation
 struct BottomNavBar: View {
     @Binding var selectedTab: AppScreen
+    var onSelect: (AppScreen) -> Void = { _ in }
     
     var body: some View {
-        HStack {
-            ForEach([AppScreen.diary, AppScreen.community, AppScreen.settings], id: \.self) { screen in
-                Spacer()
-                Button {
-                    selectedTab = screen
-                } label: {
-                    VStack(spacing: 4) {
-                        Image(systemName: icon(for: screen))
-                            .font(.system(size: 24))
-                        Text(screen.rawValue.capitalized)
-                            .font(.system(size: 10, weight: .medium))
-                    }
-                    .foregroundColor(selectedTab == screen ? DesignTokens.Colors.primary : DesignTokens.Colors.textSecondary)
-                }
-                Spacer()
+        HStack(alignment: .bottom, spacing: 14) {
+            navItem(.diary)
+            navItem(.community)
+            
+            Button {
+                select(.home)
+            } label: {
+                Image(systemName: icon(for: .home))
+                    .font(.system(size: 22, weight: .bold))
+                    .foregroundColor(.white)
+                    .frame(width: 54, height: 54)
+                    .background(DesignTokens.Colors.primary)
+                    .clipShape(Circle())
+                    .overlay(Circle().stroke(DesignTokens.Colors.surface, lineWidth: 3))
+                    .padding(.bottom, 8)
             }
+            .buttonStyle(.plain)
+            
+            navItem(.health)
+            navItem(.settings)
         }
-        .padding(.vertical, 12)
+        .padding(.horizontal, 14)
+        .padding(.top, 10)
+        .padding(.bottom, 12)
         .background(DesignTokens.Colors.surface)
         .overlay(Rectangle().frame(height: 1).foregroundColor(DesignTokens.Colors.border), alignment: .top)
     }
     
+    private func navItem(_ screen: AppScreen) -> some View {
+        Button {
+            select(screen)
+        } label: {
+            VStack(spacing: 2) {
+                Image(systemName: icon(for: screen))
+                    .font(.system(size: 19, weight: .semibold))
+                Text(title(for: screen))
+                    .font(DesignTokens.Typography.caption)
+                    .lineLimit(1)
+            }
+            .frame(maxWidth: .infinity)
+            .foregroundColor(selectedTab == screen ? DesignTokens.Colors.primary : DesignTokens.Colors.textSecondary)
+        }
+        .buttonStyle(.plain)
+    }
+    
+    private func select(_ screen: AppScreen) {
+        withAnimation(.spring(response: 0.35, dampingFraction: 0.82)) {
+            selectedTab = screen
+        }
+        onSelect(screen)
+    }
+    
+    private func title(for screen: AppScreen) -> String {
+        switch screen {
+        case .home: return "Home"
+        case .diary: return "Diary"
+        case .community: return "Ask"
+        case .health: return "Health"
+        case .settings: return "Settings"
+        case .photos: return "Photos"
+        case .shop: return "Shop"
+        }
+    }
+    
     private func icon(for screen: AppScreen) -> String {
         switch screen {
+        case .home: return "house.fill"
         case .diary: return "book.closed.fill"
         case .community: return "bubble.left.and.bubble.right.fill"
-        case .settings: return "person.crop.circle.fill"
-        default: return "questionmark"
+        case .health: return "heart.text.square.fill"
+        case .settings: return "gearshape.fill"
+        case .photos: return "photo.on.rectangle"
+        case .shop: return "bag.fill"
         }
     }
 }

@@ -25,12 +25,19 @@ struct LoginView: View {
                 // Form
                 VStack(spacing: DesignTokens.Spacing.m) {
                     TextField("Email", text: $email)
+                        .keyboardType(.emailAddress)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled(true)
+                        .textContentType(.emailAddress)
                         .padding()
                         .background(DesignTokens.Colors.surface)
                         .cornerRadius(DesignTokens.Radius.m)
                         .overlay(RoundedRectangle(cornerRadius: DesignTokens.Radius.m).stroke(DesignTokens.Colors.border))
                     
                     SecureField("Password", text: $password)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled(true)
+                        .textContentType(.password)
                         .padding()
                         .background(DesignTokens.Colors.surface)
                         .cornerRadius(DesignTokens.Radius.m)

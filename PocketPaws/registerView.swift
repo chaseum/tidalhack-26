@@ -6,6 +6,12 @@ struct RegisterView: View {
     @State private var email = ""
     @State private var password = ""
     
+    private var canCreateAccount: Bool {
+        !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
+        !email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
+        !password.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+    
     var body: some View {
         ZStack {
             PetPalBackground()
@@ -33,12 +39,19 @@ struct RegisterView: View {
                         .overlay(RoundedRectangle(cornerRadius: DesignTokens.Radius.m).stroke(DesignTokens.Colors.border))
                     
                     TextField("Email", text: $email)
+                        .keyboardType(.emailAddress)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled(true)
+                        .textContentType(.emailAddress)
                         .padding()
                         .background(DesignTokens.Colors.surface)
                         .cornerRadius(DesignTokens.Radius.m)
                         .overlay(RoundedRectangle(cornerRadius: DesignTokens.Radius.m).stroke(DesignTokens.Colors.border))
                     
                     SecureField("Password", text: $password)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled(true)
+                        .textContentType(.newPassword)
                         .padding()
                         .background(DesignTokens.Colors.surface)
                         .cornerRadius(DesignTokens.Radius.m)
@@ -47,7 +60,7 @@ struct RegisterView: View {
                 .padding(.horizontal, DesignTokens.Spacing.l)
                 
                 Button {
-                    router.navigate(to: .home)
+                    router.login()
                 } label: {
                     Text("Create Account")
                         .font(DesignTokens.Typography.headline)
@@ -58,6 +71,8 @@ struct RegisterView: View {
                         .cornerRadius(DesignTokens.Radius.m)
                 }
                 .padding(.horizontal, DesignTokens.Spacing.l)
+                .disabled(!canCreateAccount)
+                .opacity(canCreateAccount ? 1 : 0.6)
                 
                 Spacer()
             }

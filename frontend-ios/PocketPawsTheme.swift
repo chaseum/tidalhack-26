@@ -41,20 +41,6 @@ struct PetPalBackground: View {
     }
 }
 
-struct LevelChip: View {
-    let level: Int
-    
-    var body: some View {
-        Text("LVL \(level)")
-            .font(DesignTokens.Typography.caption)
-            .foregroundColor(.white)
-            .padding(.horizontal, DesignTokens.Spacing.s)
-            .padding(.vertical, DesignTokens.Spacing.xs)
-            .background(DesignTokens.Colors.secondary)
-            .clipShape(Capsule())
-    }
-}
-
 struct CircularIconButton: View {
     let icon: String
     let action: () -> Void

@@ -1,7 +1,8 @@
 import SwiftUI
 
-struct LoginView: View {
+struct RegisterView: View {
     @EnvironmentObject var router: Router
+    @State private var name = ""
     @State private var email = ""
     @State private var password = ""
     
@@ -10,27 +11,41 @@ struct LoginView: View {
             PetPalBackground()
             
             VStack(spacing: DesignTokens.Spacing.xl) {
-                Spacer()
-                
-                // Logo
-                VStack(spacing: DesignTokens.Spacing.m) {
-                    Image(systemName: "pawprint.fill")
-                        .font(.system(size: 80))
-                        .foregroundColor(DesignTokens.Colors.primary)
-                    Text("PocketPaws")
-                        .font(DesignTokens.Typography.title)
-                        .foregroundColor(DesignTokens.Colors.textPrimary)
+                HStack {
+                    Button { router.pop() } label: {
+                        Image(systemName: "chevron.left")
+                            .font(.headline)
+                            .foregroundColor(DesignTokens.Colors.textPrimary)
+                    }
+                    Spacer()
                 }
+                .padding()
                 
-                // Form
+                Text("Join PocketPaws")
+                    .font(DesignTokens.Typography.title)
+                    .foregroundColor(DesignTokens.Colors.textPrimary)
+                
                 VStack(spacing: DesignTokens.Spacing.m) {
+                    TextField("Pet's Name", text: $name)
+                        .padding()
+                        .background(DesignTokens.Colors.surface)
+                        .cornerRadius(DesignTokens.Radius.m)
+                        .overlay(RoundedRectangle(cornerRadius: DesignTokens.Radius.m).stroke(DesignTokens.Colors.border))
+                    
                     TextField("Email", text: $email)
+                        .keyboardType(.emailAddress)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled(true)
+                        .textContentType(.emailAddress)
                         .padding()
                         .background(DesignTokens.Colors.surface)
                         .cornerRadius(DesignTokens.Radius.m)
                         .overlay(RoundedRectangle(cornerRadius: DesignTokens.Radius.m).stroke(DesignTokens.Colors.border))
                     
                     SecureField("Password", text: $password)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled(true)
+                        .textContentType(.newPassword)
                         .padding()
                         .background(DesignTokens.Colors.surface)
                         .cornerRadius(DesignTokens.Radius.m)
@@ -41,7 +56,7 @@ struct LoginView: View {
                 Button {
                     router.navigate(to: .home)
                 } label: {
-                    Text("Login")
+                    Text("Create Account")
                         .font(DesignTokens.Typography.headline)
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
@@ -51,14 +66,6 @@ struct LoginView: View {
                 }
                 .padding(.horizontal, DesignTokens.Spacing.l)
                 
-                Button {
-                    router.navigate(to: .register)
-                } label: {
-                    Text("Don't have an account? Sign Up")
-                        .font(DesignTokens.Typography.body)
-                        .foregroundColor(DesignTokens.Colors.primary)
-                }
-                
                 Spacer()
             }
         }
@@ -66,8 +73,8 @@ struct LoginView: View {
     }
 }
 
-struct LoginView_Preview: PreviewProvider {
+struct RegisterView_Preview: PreviewProvider {
     static var previews: some View {
-        LoginView().environmentObject(Router())
+        RegisterView().environmentObject(Router())
     }
 }

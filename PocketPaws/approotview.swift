@@ -5,7 +5,13 @@ struct AppRootView: View {
     
     var body: some View {
         NavigationStack(path: $router.path) {
-            LoginView()
+            Group {
+                if router.isAuthenticated {
+                    HomeLauncherView()
+                } else {
+                    LoginView()
+                }
+            }
                 .navigationDestination(for: AppRoute.self) { route in
                     switch route {
                     case .login: LoginView()
@@ -14,11 +20,13 @@ struct AppRootView: View {
                     case .diary: PetDiaryView()
                     case .photos: PetPhotosView()
                     case .community: CommunityChatView()
+                    case .health: HealthStatusView()
+                    case .shop: ShopView()
                     case .settings: SettingsView()
-                    default: HomeLauncherView()
                     }
                 }
         }
+        .preferredColorScheme(.light)
         .environmentObject(router)
     }
 }

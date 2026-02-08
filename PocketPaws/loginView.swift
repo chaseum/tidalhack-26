@@ -5,6 +5,11 @@ struct LoginView: View {
     @State private var email = ""
     @State private var password = ""
     
+    private var canLogin: Bool {
+        !email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
+        !password.isEmpty
+    }
+    
     var body: some View {
         ZStack {
             PetPalBackground()
@@ -25,12 +30,19 @@ struct LoginView: View {
                 // Form
                 VStack(spacing: DesignTokens.Spacing.m) {
                     TextField("Email", text: $email)
+                        .keyboardType(.emailAddress)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled(true)
+                        .textContentType(.emailAddress)
                         .padding()
                         .background(DesignTokens.Colors.surface)
                         .cornerRadius(DesignTokens.Radius.m)
                         .overlay(RoundedRectangle(cornerRadius: DesignTokens.Radius.m).stroke(DesignTokens.Colors.border))
                     
                     SecureField("Password", text: $password)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled(true)
+                        .textContentType(.password)
                         .padding()
                         .background(DesignTokens.Colors.surface)
                         .cornerRadius(DesignTokens.Radius.m)
@@ -39,7 +51,7 @@ struct LoginView: View {
                 .padding(.horizontal, DesignTokens.Spacing.l)
                 
                 Button {
-                    router.navigate(to: .home)
+                    router.login()
                 } label: {
                     Text("Login")
                         .font(DesignTokens.Typography.headline)
@@ -50,6 +62,8 @@ struct LoginView: View {
                         .cornerRadius(DesignTokens.Radius.m)
                 }
                 .padding(.horizontal, DesignTokens.Spacing.l)
+                .disabled(!canLogin)
+                .opacity(canLogin ? 1 : 0.6)
                 
                 Button {
                     router.navigate(to: .register)

@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 /// PocketPaws Design System Tokens
 /// Defined based on the brand's playful and organic visual identity.
@@ -6,16 +7,16 @@ enum DesignTokens {
     
     // MARK: - Colors
     struct Colors {
-        static let backgroundGradient = [Color(hex: "#FDFCF0"), Color(hex: "#E2F2D5")]
-        static let surface = Color(hex: "#FFFFFF")
-        static let primary = Color(hex: "#97B476")
-        static let secondary = Color(hex: "#B199F9")
-        static let textPrimary = Color(hex: "#1D2939")
-        static let textSecondary = Color(hex: "#667085")
-        static let border = Color(hex: "#F2F4F7")
-        static let accentSuccess = Color(hex: "#97B476")
-        static let accentWarning = Color(hex: "#FFD666")
-        static let accentDestructive = Color(hex: "#FF99C8")
+        static let backgroundGradient = [Color(hex: "#F4F2E1"), Color(hex: "#CBE4A5")]
+        static let surface = Color(hex: "#F8F6E8")
+        static let primary = Color(hex: "#79AB61")
+        static let secondary = Color(hex: "#74C2E8")
+        static let textPrimary = Color(hex: "#1A2740")
+        static let textSecondary = Color(hex: "#586379")
+        static let border = Color(hex: "#DFDCCB")
+        static let accentSuccess = Color(hex: "#79AB61")
+        static let accentWarning = Color(hex: "#F4B26D")
+        static let accentDestructive = Color(hex: "#F07A86")
     }
     
     // MARK: - Spacing
@@ -39,13 +40,21 @@ enum DesignTokens {
     
     // MARK: - Typography
     struct Typography {
-        static let title = Font.system(size: 34, weight: .bold, design: .rounded)
-        static let headline = Font.system(size: 20, weight: .semibold, design: .rounded)
+        static let title = retro(size: 34, weight: .bold)
+        static let headline = retro(size: 20, weight: .semibold)
         static let body = Font.system(size: 16, weight: .regular, design: .rounded)
-        static let caption = Font.system(size: 12, weight: .medium, design: .rounded)
+        static let caption = retro(size: 12, weight: .medium)
         
-        // Custom branding font (Optional implementation)
-        static let branding = Font.system(size: 24, weight: .bold, design: .monospaced)
+        static let branding = retro(size: 24, weight: .bold)
+        
+        private static func retro(size: CGFloat, weight: Font.Weight) -> Font {
+            // Uses custom pixel font when available in project, otherwise a built-in monospaced fallback.
+            let candidates = ["PressStart2P-Regular", "Silkscreen-Regular", "Pixellari"]
+            for fontName in candidates where UIFont(name: fontName, size: size) != nil {
+                return .custom(fontName, size: size)
+            }
+            return .system(size: size, weight: weight, design: .monospaced)
+        }
     }
     
     // MARK: - Shadows

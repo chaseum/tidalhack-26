@@ -24,7 +24,7 @@ struct LauncherItem: Codable, Identifiable {
 }
 
 enum AppScreen: String, Codable {
-    case diary, photos, community, health, shop, settings
+    case home, diary, photos, community, health, shop, settings
 }
 
 // MARK: - Diary & Photos
@@ -53,6 +53,15 @@ struct ChatMessage: Codable, Identifiable {
     let text: String
     let timestamp: Date
     let isMine: Bool
+}
+
+struct WeeklyActivityDay: Codable, Identifiable {
+    let id: UUID
+    let dayLabel: String
+    let walkMinutes: Int
+    let playMinutes: Int
+    let mealsLogged: Int
+    let mood: String
 }
 
 // MARK: - Settings
