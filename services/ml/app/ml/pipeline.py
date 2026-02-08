@@ -15,6 +15,7 @@ import torch
 from PIL import Image
 from torch import nn
 from torch.utils.data import DataLoader, Dataset
+from tqdm import tqdm
 
 from .model import (
     OxfordPetBreedClassifier,
@@ -36,7 +37,15 @@ def _services_ml_root() -> Path:
     return Path(__file__).resolve().parents[2]
 
 
+def _repo_root() -> Path:
+    # services/ml/app/ml/pipeline.py -> repo root
+    return Path(__file__).resolve().parents[4]
+
+
 def default_dataset_dir() -> Path:
+    repo_dataset = _repo_root() / "dataset"
+    if repo_dataset.exists():
+        return repo_dataset
     return _services_ml_root() / "data" / "oxford_iiit_pet"
 
 
@@ -221,6 +230,7 @@ class TrainingConfig:
     seed: int = 42
     device: str = "cpu"
     force_download: bool = False
+    show_progress: bool = True
 
 
 def _split_train_val(
@@ -274,6 +284,10 @@ def _run_epoch(
     criterion: nn.Module,
     optimizer: torch.optim.Optimizer | None,
     device: torch.device,
+    epoch_index: int,
+    total_epochs: int,
+    phase: str,
+    show_progress: bool,
 ) -> tuple[float, float]:
     training = optimizer is not None
     model.train(training)
@@ -282,7 +296,18 @@ def _run_epoch(
     total_acc = 0.0
     batches = 0
 
-    for images, labels in dataloader:
+    iterator = (
+        tqdm(
+            dataloader,
+            desc=f"Epoch {epoch_index}/{total_epochs} [{phase}]",
+            dynamic_ncols=True,
+            leave=False,
+        )
+        if show_progress
+        else dataloader
+    )
+
+    for images, labels in iterator:
         images = images.to(device)
         labels = labels.to(device)
 
@@ -299,6 +324,11 @@ def _run_epoch(
         total_loss += float(loss.item())
         total_acc += _accuracy(logits.detach(), labels)
         batches += 1
+        if show_progress and isinstance(iterator, tqdm):
+            iterator.set_postfix(
+                loss=f"{(total_loss / batches):.4f}",
+                acc=f"{(total_acc / batches):.4f}",
+            )
 
     if batches == 0:
         return 0.0, 0.0
@@ -378,20 +408,33 @@ def train_oxford_pet_breed_model(config: TrainingConfig) -> dict[str, float]:
     best_state: dict[str, torch.Tensor] | None = None
     best_train_acc = 0.0
 
-    for _epoch in range(config.epochs):
-        _train_loss, train_acc = _run_epoch(
+    for epoch in range(config.epochs):
+        train_loss, train_acc = _run_epoch(
             model=model,
             dataloader=train_loader,
             criterion=criterion,
             optimizer=optimizer,
             device=device,
+            epoch_index=epoch + 1,
+            total_epochs=config.epochs,
+            phase="train",
+            show_progress=config.show_progress,
         )
-        _val_loss, val_acc = _run_epoch(
+        val_loss, val_acc = _run_epoch(
             model=model,
             dataloader=val_loader,
             criterion=criterion,
             optimizer=None,
             device=device,
+            epoch_index=epoch + 1,
+            total_epochs=config.epochs,
+            phase="val",
+            show_progress=config.show_progress,
+        )
+        print(
+            f"Epoch {epoch + 1}/{config.epochs} "
+            f"train_loss={train_loss:.4f} train_acc={train_acc:.4f} "
+            f"val_loss={val_loss:.4f} val_acc={val_acc:.4f}"
         )
 
         if val_acc > best_val_acc:
@@ -471,6 +514,7 @@ def _build_parser() -> argparse.ArgumentParser:
     train_cmd.add_argument("--seed", type=int, default=42)
     train_cmd.add_argument("--device", type=str, default="auto")
     train_cmd.add_argument("--force-download", action="store_true")
+    train_cmd.add_argument("--no-progress", action="store_true")
 
     predict_cmd = subparsers.add_parser("predict", help="Predict breed for one image")
     predict_cmd.add_argument("image", type=Path)
@@ -512,6 +556,7 @@ def main() -> int:
                     seed=args.seed,
                     device=args.device,
                     force_download=args.force_download,
+                    show_progress=not args.no_progress,
                 )
             )
         except RuntimeError as exc:
