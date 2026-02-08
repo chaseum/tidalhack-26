@@ -1,0 +1,73 @@
+{
+  "colors": {
+    "backgroundGradientStops": [
+      "#FDFCF0",
+      "#E2F2D5"
+    ],
+    "surface": "#FFFFFF",
+    "primary": "#97B476",
+    "secondary": "#B199F9",
+    "textPrimary": "#1D2939",
+    "textSecondary": "#667085",
+    "border": "#F2F4F7",
+    "accentSuccess": "#97B476",
+    "accentWarning": "#FFD666",
+    "accentDestructive": "#FF99C8"
+  },
+  "typography": {
+    "title": {
+      "size": 34,
+      "weight": "bold",
+      "letterSpacing": -0.5
+    },
+    "headline": {
+      "size": 20,
+      "weight": "semibold",
+      "letterSpacing": 0
+    },
+    "body": {
+      "size": 16,
+      "weight": "regular",
+      "letterSpacing": 0
+    },
+    "caption": {
+      "size": 12,
+      "weight": "medium",
+      "letterSpacing": 0.5
+    },
+    "branding": {
+      "fontName": "PixeloidSans",
+      "size": 24,
+      "weight": "bold"
+    }
+  },
+  "spacing": {
+    "xs": 4,
+    "s": 8,
+    "m": 16,
+    "l": 24,
+    "xl": 32
+  },
+  "radius": {
+    "s": 8,
+    "m": 16,
+    "l": 24,
+    "xl": 32,
+    "pill": 999,
+    "circle": 500
+  },
+  "shadow": {
+    "soft": {
+      "opacity": 0.06,
+      "radius": 4,
+      "x": 0,
+      "y": 2
+    },
+    "medium": {
+      "opacity": 0.12,
+      "radius": 12,
+      "x": 0,
+      "y": 6
+    }
+  }
+}
