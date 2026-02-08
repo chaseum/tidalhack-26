@@ -1,6 +1,8 @@
 # OS
 .DS_Store
 
+# dataset
+oxford-iiit pet dataset
 # Python
 __pycache__/
 *.py[cod]
@@ -24,3 +26,4 @@ coverage/
 # Local env/config
 .env
 .env.*
+node_modules

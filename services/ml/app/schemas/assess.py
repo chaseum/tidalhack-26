@@ -18,17 +18,23 @@ class AssessMask(BaseModel):
     available: bool
 
 
+class AssessBreedProb(BaseModel):
+    breed: str
+    p: float = Field(ge=0.0, le=1.0)
+
+
 class AssessRatios(BaseModel):
-    environmental: float
-    social: float
-    governance: float
+    length_px: float
+    waist_to_chest: float
+    width_profile: list[float] = Field(min_length=5, max_length=5)
+    belly_tuck: float
 
 
 class AssessResponse(BaseModel):
     species: str
-    breed_top3: list[str] = Field(min_length=3, max_length=3)
+    breed_top3: list[AssessBreedProb] = Field(min_length=3, max_length=3)
     mask: AssessMask
-    ratios: AssessRatios
-    bucket: Literal["low", "medium", "high"]
+    ratios: Optional[AssessRatios] = None
+    bucket: Literal["UNDERWEIGHT", "IDEAL", "OVERWEIGHT", "OBESE", "UNKNOWN"]
     confidence: float = Field(ge=0.0, le=1.0)
-    notes: list[str]
+    notes: str
