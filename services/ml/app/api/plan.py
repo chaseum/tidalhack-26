@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 
 from app.schemas.plan import Goal, PlanRequest, PlanResponse
+from app.state.pet_store import pet_store
 
 router = APIRouter()
 
@@ -47,7 +48,7 @@ def plan(payload: PlanRequest) -> PlanResponse:
     daily_calories = round(rer * multiplier)
     grams_per_day = round(daily_calories / kcal_per_g)
 
-    return PlanResponse(
+    response = PlanResponse(
         pet_id=payload.pet_id,
         species=payload.species,
         weight_kg=payload.weight_kg,
@@ -61,3 +62,5 @@ def plan(payload: PlanRequest) -> PlanResponse:
         grams_per_day=grams_per_day,
         disclaimer=DISCLAIMER,
     )
+    pet_store.save_last_plan(payload.pet_id, response.model_dump())
+    return response

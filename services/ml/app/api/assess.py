@@ -9,7 +9,7 @@ from typing import Any, Literal, cast
 from urllib.error import URLError
 
 import numpy as np
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, File, Form, HTTPException, Request, UploadFile
 from openai import APIConnectionError, APITimeoutError
 from PIL import Image, UnidentifiedImageError
 
@@ -18,7 +18,14 @@ from app.ml.breed_bbox import breed_bbox
 from app.ml.breed_priors import load_priors
 from app.ml.ratio_features import extract_ratio_features
 from app.ml.segmenter import Segmenter
-from app.schemas.assess import AssessMask, AssessRatios, AssessRequest, AssessResponse
+from app.schemas.assess import (
+    AssessMask,
+    AssessRatios,
+    AssessRequest,
+    AssessRequestMeta,
+    AssessResponse,
+)
+from app.state.pet_store import pet_store
 
 router = APIRouter()
 ASSESS_TIMEOUT_SECONDS = 8.0
@@ -111,10 +118,18 @@ def _run_with_budget(fn: Any, deadline: float, *args: Any, **kwargs: Any) -> Any
 
 
 @router.post("/assess", response_model=AssessResponse)
-async def assess(request: Request) -> AssessResponse:
+async def assess(
+    request: Request,
+    image: UploadFile | None = File(default=None),
+    species: str | None = Form(default=None),
+    breed_hint: str | None = Form(default=None),
+    weight_kg: float | None = Form(default=None),
+    request_payload: str | None = Form(default=None, alias="request"),
+) -> AssessResponse:
     deadline = time.monotonic() + ASSESS_TIMEOUT_SECONDS
     payload: AssessRequest | None = None
     content_type = request.headers.get("content-type", "")
+    request_meta: AssessRequestMeta | None = None
 
     if content_type.startswith("application/json"):
         try:
@@ -126,16 +141,51 @@ async def assess(request: Request) -> AssessResponse:
         except Exception as exc:
             raise HTTPException(status_code=422, detail="Invalid assess request payload.") from exc
 
-        image_bytes, mime = _fetch_image_bytes_and_mime(
-            image_url=str(payload.image_url),
-            deadline=deadline,
-        )
+        image_bytes, mime = _fetch_image_bytes_and_mime(str(payload.image_url), deadline)
     else:
-        upload_bytes = await request.body()
+        if image is None:
+            raise HTTPException(status_code=400, detail="image file is required.")
+
+        upload_bytes = await image.read()
         image_bytes, mime = _read_upload_bytes_and_mime(
             image_bytes=upload_bytes,
-            content_type=content_type,
+            content_type=image.content_type or content_type,
         )
+        try:
+            request_meta = AssessRequestMeta(
+                species=species,
+                breed_hint=breed_hint,
+                weight_kg=weight_kg,
+            )
+        except Exception as exc:
+            raise HTTPException(
+                status_code=422,
+                detail="Invalid request metadata.",
+            ) from exc
+
+        if request_payload:
+            try:
+                parsed_request_payload = json.loads(request_payload)
+            except json.JSONDecodeError as exc:
+                raise HTTPException(
+                    status_code=400,
+                    detail="request must be valid JSON.",
+                ) from exc
+
+            try:
+                if isinstance(parsed_request_payload, dict) and isinstance(
+                    parsed_request_payload.get("meta"), dict
+                ):
+                    request_meta = AssessRequestMeta.model_validate(
+                        parsed_request_payload["meta"]
+                    )
+                else:
+                    request_meta = AssessRequestMeta.model_validate(parsed_request_payload)
+            except Exception as exc:
+                raise HTTPException(
+                    status_code=422,
+                    detail="Invalid request metadata.",
+                ) from exc
 
     image_rgb = _decode_rgb(image_bytes)
     _ensure_time(deadline)
@@ -190,17 +240,20 @@ async def assess(request: Request) -> AssessResponse:
     bucket, confidence, notes = classify_bcs_bucket(
         ratios=ratios_dict,
         species=breed_result["species"],
-        weight_kg=payload.meta.weight_kg if payload and payload.meta else None,
+        weight_kg=(
+            payload.meta.weight_kg
+            if payload and payload.meta
+            else (request_meta.weight_kg if request_meta else None)
+        ),
         breed_top1=breed_result["breed_top3"][0]["breed"],
         priors=priors,
     )
 
-    ratios = AssessRatios(**ratios_dict) if ratios_dict else None
-    return AssessResponse(
+    response = AssessResponse(
         species=breed_result["species"],
         breed_top3=breed_result["breed_top3"],
         mask=AssessMask(available=mask_available),
-        ratios=ratios,
+        ratios=AssessRatios(**ratios_dict) if ratios_dict else None,
         bucket=cast(
             Literal["UNDERWEIGHT", "IDEAL", "OVERWEIGHT", "OBESE", "UNKNOWN"],
             bucket,
@@ -208,3 +261,11 @@ async def assess(request: Request) -> AssessResponse:
         confidence=confidence,
         notes=notes,
     )
+    pet_id = (
+        payload.meta.pet_id
+        if payload and payload.meta and payload.meta.pet_id
+        else (request_meta.pet_id if request_meta and request_meta.pet_id else None)
+    )
+    if pet_id:
+        pet_store.save_last_assess(pet_id, response.model_dump())
+    return response

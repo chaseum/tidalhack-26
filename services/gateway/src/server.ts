@@ -1,4 +1,5 @@
 import express, { type Request, type Response } from "express";
+import { sendError } from "./error-response";
 import { errorHandler } from "./errors";
 import { requestLogger } from "./logger";
 import { assessRouter } from "./routes/assess";
@@ -17,7 +18,7 @@ export function createServer() {
   app.use("/chat", chatRouter);
 
   app.use((_req: Request, res: Response) => {
-    res.status(404).json({ error: "NotFound", detail: "Route not found" });
+    sendError(res, 404, "NotFound", "Route not found");
   });
 
   app.use(errorHandler);

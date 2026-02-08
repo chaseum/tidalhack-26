@@ -1,0 +1,19 @@
+[
+  {
+    "pet_id": "demo_dog_001",
+    "species": "dog",
+    "weight_kg": 24.5,
+    "food": {
+      "kcal_per_g": 3.6
+    }
+  },
+  {
+    "pet_id": "demo_cat_001",
+    "species": "cat",
+    "weight_kg": 4.2,
+    "food": {
+      "kcal_per_cup": 420.0,
+      "grams_per_cup": 120.0
+    }
+  }
+]

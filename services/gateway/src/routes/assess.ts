@@ -1,5 +1,6 @@
 import type { Request } from "express";
 import { Router } from "express";
+import { sendError } from "../error-response";
 import { mlAssess } from "../ml";
 import { assessRequestSchema, assessResponseSchema } from "../validators/contracts";
 
@@ -92,18 +93,17 @@ const parseMultipartParts = (rawBody: Buffer, boundary: string): MultipartPart[]
 assessRouter.post("/", async (req, res, next) => {
   const contentType = req.headers["content-type"];
   if (!contentType || !contentType.toLowerCase().startsWith("multipart/form-data")) {
-    return res.status(400).json({
-      error: "ValidationError",
-      details: [{ path: "content-type", message: "Expected multipart/form-data request" }]
-    });
+    return sendError(
+      res,
+      400,
+      "ValidationError",
+      "content-type: Expected multipart/form-data request"
+    );
   }
 
   const boundary = parseBoundary(contentType);
   if (!boundary) {
-    return res.status(400).json({
-      error: "ValidationError",
-      details: [{ path: "content-type", message: "Missing multipart boundary" }]
-    });
+    return sendError(res, 400, "ValidationError", "content-type: Missing multipart boundary");
   }
 
   try {
@@ -113,38 +113,26 @@ assessRouter.post("/", async (req, res, next) => {
     const requestPart = parts.find((part) => part.name === "request");
 
     if (!imagePart || imagePart.data.length === 0) {
-      return res.status(400).json({
-        error: "ValidationError",
-        details: [{ path: "image", message: "image file is required" }]
-      });
+      return sendError(res, 400, "ValidationError", "image: image file is required");
     }
 
     if (!requestPart || requestPart.data.length === 0) {
-      return res.status(400).json({
-        error: "ValidationError",
-        details: [{ path: "request", message: "request JSON part is required" }]
-      });
+      return sendError(res, 400, "ValidationError", "request: request JSON part is required");
     }
 
     let parsedRequestJson: unknown;
     try {
       parsedRequestJson = JSON.parse(requestPart.data.toString("utf8"));
     } catch {
-      return res.status(400).json({
-        error: "ValidationError",
-        details: [{ path: "request", message: "request must be valid JSON" }]
-      });
+      return sendError(res, 400, "ValidationError", "request: request must be valid JSON");
     }
 
     const parsedRequest = assessRequestSchema.safeParse(parsedRequestJson);
     if (!parsedRequest.success) {
-      return res.status(400).json({
-        error: "ValidationError",
-        details: parsedRequest.error.issues.map((issue) => ({
-          path: issue.path.join("."),
-          message: issue.message
-        }))
-      });
+      const message = parsedRequest.error.issues
+        .map((issue) => `${issue.path.join(".") || "request"}: ${issue.message}`)
+        .join("; ");
+      return sendError(res, 400, "ValidationError", message || "request: invalid payload");
     }
 
     const formData = new FormData();

@@ -1,8 +1,10 @@
 import type { NextFunction, Request, Response } from "express";
+import { sendError } from "./error-response";
 
 export type HttpError = Error & {
   status?: number;
-  detail?: string;
+  code?: string;
+  message?: string;
 };
 
 const isHttpError = (value: unknown): value is HttpError => {
@@ -15,13 +17,18 @@ export function errorHandler(err: unknown, _req: Request, res: Response, _next: 
       ? err.status
       : 502;
 
-  const error = err instanceof Error ? err.name || "Error" : "Error";
-  const detail =
-    isHttpError(err) && typeof err.detail === "string"
-      ? err.detail
+  const code =
+    isHttpError(err) && typeof err.code === "string"
+      ? err.code
+      : status >= 500
+        ? "UpstreamError"
+        : "InternalError";
+  const message =
+    isHttpError(err) && typeof err.message === "string" && err.message.trim().length > 0
+      ? err.message
       : err instanceof Error
         ? err.message
         : "Unexpected gateway error";
 
-  res.status(status).json({ error, detail });
+  sendError(res, status, code, message);
 }

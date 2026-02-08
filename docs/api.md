@@ -27,7 +27,7 @@ All non-2xx responses use this JSON:
 
 ```json
 {
-  "session_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+  "pet_id": "pet_123",
   "species": "dog",
   "breed_hint": "corgi"
 }
@@ -37,56 +37,33 @@ All non-2xx responses use this JSON:
 
 ```json
 {
-  "session_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
-  "scores": {
-    "environmental": 0.7,
-    "social": 0.5,
-    "governance": 0.8
+  "species": "dog",
+  "breed_top3": [
+    { "breed": "labrador_retriever", "p": 0.62 },
+    { "breed": "golden_retriever", "p": 0.21 },
+    { "breed": "mixed", "p": 0.17 }
+  ],
+  "mask": { "available": true },
+  "ratios": {
+    "length_px": 180.0,
+    "waist_to_chest": 0.78,
+    "width_profile": [0.9, 0.88, 0.85, 0.8, 0.78],
+    "belly_tuck": 0.03
   },
+  "bucket": "OVERWEIGHT",
   "confidence": 0.82,
-  "fallback_used": false,
   "notes": "Waistline and body condition appear healthy."
 }
 ```
 
 Field rules:
-- `session_id`: UUID string, required.
-- `scores.environmental|social|governance`: number in `[0, 1]`, required.
+- `species`: non-empty string, required.
+- `breed_top3`: exactly 3 entries `{ breed: string, p: number[0,1] }`, required.
+- `mask.available`: boolean, required.
+- `ratios`: object with `length_px`, `waist_to_chest`, `width_profile[5]`, `belly_tuck`; nullable.
+- `bucket`: one of `UNDERWEIGHT|IDEAL|OVERWEIGHT|OBESE|UNKNOWN`, required.
 - `confidence`: number in `[0, 1]`, required.
-- `fallback_used`: boolean, required.
-- `notes`: string, optional.
-
-### Happy Path Example
-
-```json
-{
-  "session_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
-  "scores": {
-    "environmental": 0.72,
-    "social": 0.58,
-    "governance": 0.81
-  },
-  "confidence": 0.84,
-  "fallback_used": false,
-  "notes": "Assessment completed from uploaded image."
-}
-```
-
-### Failure/Fallback Example
-
-```json
-{
-  "session_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
-  "scores": {
-    "environmental": 0.5,
-    "social": 0.5,
-    "governance": 0.5
-  },
-  "confidence": 0.2,
-  "fallback_used": true,
-  "notes": "Low-quality image; fallback baseline scores returned."
-}
-```
+- `notes`: non-empty string, required.
 
 ## POST /plan
 
@@ -96,70 +73,52 @@ Field rules:
 
 ```json
 {
-  "session_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
-  "goal": "Improve diet quality over 30 days",
-  "constraints": ["budget-friendly", "beginner"],
-  "horizon_days": 30
+  "pet_id": "pet_123",
+  "species": "dog",
+  "weight_kg": 10.0,
+  "bucket": "IDEAL",
+  "activity": "MODERATE",
+  "goal": "MAINTAIN",
+  "food": { "kcal_per_g": 3.5 }
 }
 ```
 
 Field rules:
-- `session_id`: UUID string, required.
-- `goal`: non-empty string, required.
-- `constraints`: array of strings, optional.
-- `horizon_days`: integer in `[1, 90]`, optional (default `30`).
+- `pet_id`: non-empty string, required.
+- `species`: one of `dog|cat`, required.
+- `weight_kg`: number `> 0`, required.
+- `bucket`: one of `UNDERWEIGHT|IDEAL|OVERWEIGHT|OBESE|UNKNOWN`, required.
+- `activity`: one of `LOW|MODERATE|HIGH`, required.
+- `goal`: one of `LOSE|MAINTAIN|GAIN`, required.
+- `food`: either `kcal_per_g` OR both `kcal_per_cup` and `grams_per_cup`.
 
 ### Response JSON (200)
 
 ```json
 {
-  "session_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
-  "plan": [
-    "Week 1: establish baseline meals",
-    "Week 2: replace one processed meal/day",
-    "Week 3: add hydration + fiber target",
-    "Week 4: review and adjust"
-  ],
-  "next_step": "Track meals for 3 days",
-  "fallback_used": false
+  "pet_id": "pet_123",
+  "species": "dog",
+  "weight_kg": 10.0,
+  "bucket": "IDEAL",
+  "activity": "MODERATE",
+  "goal": "MAINTAIN",
+  "kcal_per_g": 3.5,
+  "rer": 392.9895074300714,
+  "multiplier": 1.4,
+  "daily_calories": 550,
+  "grams_per_day": 157,
+  "disclaimer": "Educational estimate only. Confirm your pet's feeding plan with a licensed veterinarian."
 }
 ```
 
 Field rules:
-- `session_id`: UUID string, required.
-- `plan`: non-empty array of strings, required.
-- `next_step`: non-empty string, required.
-- `fallback_used`: boolean, required.
-
-### Happy Path Example
-
-```json
-{
-  "session_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
-  "plan": [
-    "Week 1: establish baseline meals",
-    "Week 2: replace one processed meal/day",
-    "Week 3: add hydration + fiber target",
-    "Week 4: review and adjust"
-  ],
-  "next_step": "Track meals for 3 days",
-  "fallback_used": false
-}
-```
-
-### Failure/Fallback Example
-
-```json
-{
-  "session_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
-  "plan": [
-    "Day 1: use a simple balanced-meal template",
-    "Day 2: repeat template and log adherence"
-  ],
-  "next_step": "Retry detailed planning in a few minutes",
-  "fallback_used": true
-}
-```
+- mirrors request context with normalized and computed values.
+- `kcal_per_g`: normalized calories-per-gram (`> 0`), required.
+- `rer`: number `> 0`, required.
+- `multiplier`: number `> 0`, required.
+- `daily_calories`: integer `> 0`, required.
+- `grams_per_day`: integer `> 0`, required.
+- `disclaimer`: non-empty string, required.
 
 ## POST /chat
 
@@ -170,45 +129,26 @@ Field rules:
 ```json
 {
   "message": "What should I focus on this week?",
-  "session_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+  "session_id": "optional-session-id"
 }
 ```
 
 Field rules:
 - `message`: non-empty string, required.
-- `session_id`: UUID string, optional.
+- `session_id`: non-empty string, optional.
 
 ### Response JSON (200)
 
 ```json
 {
   "reply": "Focus on consistency: complete your meal log for 3 days this week.",
-  "session_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
-  "fallback_used": false
+  "quick_actions": [
+    "Log appetite this morning and evening.",
+    "Check breathing rate while resting."
+  ]
 }
 ```
 
 Field rules:
 - `reply`: non-empty string, required.
-- `session_id`: UUID string, required.
-- `fallback_used`: boolean, required.
-
-### Happy Path Example
-
-```json
-{
-  "reply": "Great progress so far. This week, prioritize hydration and one high-fiber meal per day.",
-  "session_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
-  "fallback_used": false
-}
-```
-
-### Failure/Fallback Example
-
-```json
-{
-  "reply": "I am temporarily unavailable for detailed guidance. Please try again shortly.",
-  "session_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
-  "fallback_used": true
-}
-```
+- `quick_actions`: non-empty array of non-empty strings, required.

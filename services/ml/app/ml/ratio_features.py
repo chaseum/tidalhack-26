@@ -37,7 +37,11 @@ def _pca_major_axis(points_xy: np.ndarray) -> np.ndarray:
     norm = float(np.linalg.norm(major))
     if norm <= 1e-8:
         return np.array([1.0, 0.0], dtype=np.float64)
-    return major / norm
+    major = major / norm
+    # Resolve sign ambiguity so body progression is stable across runs/images.
+    if major[0] < 0 or (abs(float(major[0])) <= 1e-8 and major[1] < 0):
+        major = -major
+    return major
 
 
 def extract_ratio_features(mask_uint8: np.ndarray) -> dict[str, Any]:

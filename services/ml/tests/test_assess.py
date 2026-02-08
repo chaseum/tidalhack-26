@@ -122,3 +122,58 @@ def test_assess_vision_failure_returns_502(monkeypatch) -> None:
 
     assert response.status_code == 502
     assert response.json() == {"detail": "Vision service is temporarily unavailable."}
+
+
+def test_assess_accepts_multipart_form(monkeypatch) -> None:
+    from app.api import assess as assess_api
+
+    monkeypatch.setattr(assess_api, "_decode_rgb", _stub_decode_rgb)
+    monkeypatch.setattr(
+        assess_api,
+        "breed_bbox",
+        lambda image_bytes, mime: {
+            "species": "dog",
+            "breed_top3": [
+                {"breed": "labrador_retriever", "p": 0.62},
+                {"breed": "golden_retriever", "p": 0.21},
+                {"breed": "mixed", "p": 0.17},
+            ],
+            "bbox": [2, 2, 14, 14],
+        },
+    )
+    monkeypatch.setattr(
+        assess_api._segmenter,
+        "segment",
+        lambda image_rgb, bbox: np.pad(
+            np.ones((8, 8), dtype=np.uint8),
+            pad_width=((4, 4), (4, 4)),
+            mode="constant",
+            constant_values=0,
+        ),
+    )
+    monkeypatch.setattr(
+        assess_api,
+        "extract_ratio_features",
+        lambda mask_uint8: {
+            "length_px": 180.0,
+            "waist_to_chest": 0.78,
+            "width_profile": [0.90, 0.88, 0.85, 0.80, 0.78],
+            "belly_tuck": 0.03,
+        },
+    )
+    monkeypatch.setattr(assess_api, "load_priors", lambda: None)
+
+    response = client.post(
+        "/assess",
+        data={
+            "species": "dog",
+            "breed_hint": "labrador",
+            "weight_kg": "24.5",
+        },
+        files={"image": ("pet.jpg", b"fake-image-bytes", "image/jpeg")},
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["species"] == "dog"
+    assert body["mask"] == {"available": True}

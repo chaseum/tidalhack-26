@@ -25,7 +25,12 @@ const requestMl = async (path: string, init: RequestInit): Promise<unknown> => {
 
   if (!response.ok) {
     const responseText = await readErrorText(response);
-    throw new Error(`ML request failed: status=${response.status} body=${responseText}`);
+    const upstreamError = new Error(
+      `ML request failed: status=${response.status} body=${responseText}`
+    ) as Error & { status?: number; code?: string };
+    upstreamError.status = response.status >= 400 && response.status <= 599 ? response.status : 502;
+    upstreamError.code = "UpstreamError";
+    throw upstreamError;
   }
 
   return response.json();

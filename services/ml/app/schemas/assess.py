@@ -4,6 +4,7 @@ from pydantic import AnyUrl, BaseModel, Field
 
 
 class AssessRequestMeta(BaseModel):
+    pet_id: Optional[str] = Field(default=None, min_length=1)
     species: Optional[str] = None
     breed_hint: Optional[str] = None
     weight_kg: Optional[float] = Field(default=None, gt=0.0)
