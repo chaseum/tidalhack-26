@@ -3,6 +3,7 @@ import { BrowserRouter, Navigate, Outlet, Route, Routes } from 'react-router-dom
 import HomePage from './Home';
 import ChatPage from './Chat';
 import PicturesPage from './Pictures';
+import PlanPage from './Plan';
 import SettingsPage from './Settings';
 import PetDiaryPage from './PetDiary';
 import LoginPage from './Login';
@@ -52,8 +53,10 @@ function ThemedRoutes() {
 
       <Route element={<ProtectedRoute />}>
         <Route path="/home" element={<HomePage />} />
+        <Route path="/scan" element={<PicturesPage />} />
+        <Route path="/pictures" element={<Navigate to="/scan" replace />} />
+        <Route path="/plan" element={<PlanPage />} />
         <Route path="/chat" element={<ChatPage />} />
-        <Route path="/pictures" element={<PicturesPage />} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/petdiary" element={<PetDiaryPage />} />
       </Route>

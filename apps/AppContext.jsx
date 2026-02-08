@@ -35,6 +35,8 @@ const defaultState = {
       createdAt: new Date().toISOString(),
     },
   ],
+  latestAssess: null,
+  latestPlan: null,
   settings: {
     theme: 'sunrise',
     fontScale: 1,
@@ -57,6 +59,9 @@ function readState() {
       diaryEntries: Array.isArray(parsed.diaryEntries) ? parsed.diaryEntries : defaultState.diaryEntries,
       photos: Array.isArray(parsed.photos) ? parsed.photos : [],
       chatMessages: Array.isArray(parsed.chatMessages) ? parsed.chatMessages : defaultState.chatMessages,
+      latestAssess:
+        parsed.latestAssess && typeof parsed.latestAssess === 'object' ? parsed.latestAssess : null,
+      latestPlan: parsed.latestPlan && typeof parsed.latestPlan === 'object' ? parsed.latestPlan : null,
     };
   } catch (_err) {
     return defaultState;
@@ -120,6 +125,18 @@ export function AppProvider({ children }) {
         setState((prev) => ({
           ...prev,
           chatMessages: [...prev.chatMessages, message],
+        }));
+      },
+      setLatestAssess: (assess) => {
+        setState((prev) => ({
+          ...prev,
+          latestAssess: assess || null,
+        }));
+      },
+      setLatestPlan: (plan) => {
+        setState((prev) => ({
+          ...prev,
+          latestPlan: plan || null,
         }));
       },
       updateSettings: (patch) => {

@@ -1,6 +1,10 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import BottomNav from './BottomNav';
 import { useApp } from './AppContext';
+import { sendChatMessage as requestChatMessage } from './apiClient';
+
+const CHAT_SESSION_KEY = 'petapp_chat_session_id_v1';
 
 function inferSuggestedDiaryAction(text) {
   const lower = text.toLowerCase();
@@ -24,30 +28,40 @@ function inferSuggestedDiaryAction(text) {
   return { type: 'Other', notes: 'Chat follow-up: general wellness recommendation added.' };
 }
 
-function assistantReply(userText, petName) {
-  const lower = userText.toLowerCase();
-
-  if (lower.includes('eating') || lower.includes('appetite')) {
-    return `${petName}'s appetite changes should be tracked for 3-5 days. Log meals, energy, and stool quality in Pet Diary.`;
-  }
-  if (lower.includes('itch') || lower.includes('skin')) {
-    return `For skin concerns, monitor scratching frequency, check for redness, and document bathing products. Add observations to Pet Diary and escalate to a vet if worsening.`;
-  }
-  if (lower.includes('walk') || lower.includes('exercise')) {
-    return `A steady exercise rhythm helps mood and digestion. Try two short sessions and log behavior before and after each walk.`;
+function getOrCreateChatSessionId() {
+  const existing = localStorage.getItem(CHAT_SESSION_KEY);
+  if (existing && existing.trim()) {
+    return existing;
   }
 
-  return `I can help build a care routine for ${petName}. Tell me symptoms, behavior changes, and recent routines. I will suggest what to track next.`;
+  const generated = `chat-${Date.now()}-${Math.random().toString(16).slice(2, 10)}`;
+  localStorage.setItem(CHAT_SESSION_KEY, generated);
+  return generated;
 }
 
 function ChatPage() {
+  const location = useLocation();
+  const navigate = useNavigate();
   const {
     state: { chatMessages, petProfile },
     actions,
   } = useApp();
+
   const [input, setInput] = useState('');
   const [lastSuggestedAction, setLastSuggestedAction] = useState(null);
   const [autoLogEnabled, setAutoLogEnabled] = useState(true);
+  const [backendQuickActions, setBackendQuickActions] = useState([]);
+  const [chatError, setChatError] = useState('');
+  const [isSending, setIsSending] = useState(false);
+  const [chatSessionId, setChatSessionId] = useState(() => getOrCreateChatSessionId());
+
+  useEffect(() => {
+    const prefill = location.state?.prefill;
+    if (typeof prefill === 'string' && prefill.trim()) {
+      setInput(prefill.trim());
+      navigate(location.pathname, { replace: true, state: null });
+    }
+  }, [location.pathname, location.state, navigate]);
 
   const suggestedPrompts = useMemo(
     () => [
@@ -58,31 +72,51 @@ function ChatPage() {
     []
   );
 
-  const sendMessage = (text) => {
+  const sendMessage = async (text) => {
     const trimmed = text.trim();
-    if (!trimmed) return;
+    if (!trimmed || isSending) return;
 
+    setChatError('');
+    setIsSending(true);
     actions.addChatMessage({ role: 'user', text: trimmed });
 
-    const reply = assistantReply(trimmed, petProfile.name);
-    actions.addChatMessage({ role: 'assistant', text: reply });
-
-    const suggestedAction = inferSuggestedDiaryAction(trimmed);
-    setLastSuggestedAction(suggestedAction);
-
-    if (autoLogEnabled) {
-      actions.addDiaryEntry({
-        type: suggestedAction.type,
-        date: new Date().toISOString().slice(0, 10),
-        notes: suggestedAction.notes,
+    try {
+      const response = await requestChatMessage({
+        message: trimmed,
+        sessionId: chatSessionId,
       });
+
+      actions.addChatMessage({ role: 'assistant', text: response.reply });
+      setBackendQuickActions(Array.isArray(response.quick_actions) ? response.quick_actions : []);
+
+      const suggestedAction = inferSuggestedDiaryAction(trimmed);
+      setLastSuggestedAction(suggestedAction);
+
+      if (autoLogEnabled) {
+        actions.addDiaryEntry({
+          type: suggestedAction.type,
+          date: new Date().toISOString().slice(0, 10),
+          notes: suggestedAction.notes,
+        });
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Could not reach assistant service.';
+      setChatError(message);
+      setBackendQuickActions([]);
+      actions.addChatMessage({
+        role: 'assistant',
+        text: 'I could not reach the assistant right now. Please try again in a moment.',
+      });
+    } finally {
+      setIsSending(false);
     }
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    sendMessage(input);
+    const outbound = input;
     setInput('');
+    await sendMessage(outbound);
   };
 
   const addSuggestionToDiary = () => {
@@ -94,16 +128,28 @@ function ChatPage() {
     });
   };
 
+  const resetChatSession = () => {
+    const nextSession = `chat-${Date.now()}-${Math.random().toString(16).slice(2, 10)}`;
+    localStorage.setItem(CHAT_SESSION_KEY, nextSession);
+    setChatSessionId(nextSession);
+    setBackendQuickActions([]);
+    setChatError('');
+  };
+
   return (
     <main className="page-shell">
-      <h1 className="page-header">Health Chat</h1>
-      <p className="muted">
-        Ask wellness questions about {petProfile.name}. Chat suggestions can be sent directly to the Pet Diary.
-      </p>
+      <h1 className="page-header">Health Coach</h1>
+      <p className="muted">Ask wellness questions about {petProfile.name}. Messages are sent to backend /chat.</p>
 
       <section className="grid-two">
         <article className="card stack">
-          <h2>Chatbot</h2>
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, alignItems: 'center' }}>
+            <h2 style={{ margin: 0 }}>Coach Chat</h2>
+            <button type="button" className="button ghost" onClick={resetChatSession}>
+              New session
+            </button>
+          </div>
+
           <div className="chat-list" style={{ maxHeight: 420, overflow: 'auto' }}>
             {chatMessages.map((message) => (
               <div key={message.id} className={`chat-item ${message.role}`}>
@@ -113,6 +159,7 @@ function ChatPage() {
                 <p style={{ marginBottom: 0 }}>{message.text}</p>
               </div>
             ))}
+            {isSending && <p className="small muted">Assistant is thinking...</p>}
           </div>
 
           <form onSubmit={handleSubmit} className="stack">
@@ -124,10 +171,12 @@ function ChatPage() {
               value={input}
               onChange={(event) => setInput(event.target.value)}
             />
-            <button className="button" type="submit">
-              Send
+            <button className="button" type="submit" disabled={isSending}>
+              {isSending ? 'Sending...' : 'Send'}
             </button>
           </form>
+
+          {chatError && <p style={{ color: 'var(--danger)', margin: 0 }}>{chatError}</p>}
         </article>
 
         <aside className="card stack">
@@ -141,12 +190,29 @@ function ChatPage() {
             <option value="on">On</option>
             <option value="off">Off</option>
           </select>
+
           <div className="stack">
             {suggestedPrompts.map((prompt) => (
               <button key={prompt} type="button" className="button ghost" onClick={() => sendMessage(prompt)}>
                 {prompt}
               </button>
             ))}
+          </div>
+
+          <div className="card" style={{ padding: 12 }}>
+            <h3 style={{ marginBottom: 8 }}>Backend Quick Actions</h3>
+            {backendQuickActions.length === 0 && (
+              <p className="muted" style={{ margin: 0 }}>
+                Send a message to receive quick actions from /chat.
+              </p>
+            )}
+            <div className="stack">
+              {backendQuickActions.map((action) => (
+                <button key={action} type="button" className="button ghost" onClick={() => sendMessage(action)}>
+                  {action}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="card" style={{ padding: 12 }}>

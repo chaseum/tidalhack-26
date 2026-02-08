@@ -12,20 +12,26 @@ struct AppRootView: View {
                     LoginView()
                 }
             }
-                .navigationDestination(for: AppRoute.self) { route in
-                    switch route {
-                    case .login: LoginView()
-                    case .register: RegisterView()
-                    case .home: HomeLauncherView()
-                    case .diary: PetDiaryView()
-                    case .photos: PetPhotosView()
-                    case .community: CommunityChatView()
-                    case .health: HealthStatusView()
-                    case .shop: ShopView()
-                    case .settings: SettingsView()
-                    }
+            .navigationDestination(for: AppRoute.self) { route in
+                let transition = AnyTransition.asymmetric(
+                    insertion: .move(edge: .trailing).combined(with: .opacity),
+                    removal: .move(edge: .leading).combined(with: .opacity)
+                )
+                
+                switch route {
+                case .login: LoginView().transition(transition)
+                case .register: RegisterView().transition(transition)
+                case .home: HomeLauncherView().transition(transition)
+                case .diary: PetDiaryView().transition(transition)
+                case .photos: PetPhotosView().transition(transition)
+                case .community: CommunityChatView().transition(transition)
+                case .health: HealthStatusView().transition(transition)
+                case .shop: ShopView().transition(transition)
+                case .settings: SettingsView().transition(transition)
                 }
+            }
         }
+        .animation(.default, value: router.path)
         .preferredColorScheme(.light)
         .environmentObject(router)
     }

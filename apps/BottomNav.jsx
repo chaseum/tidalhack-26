@@ -4,8 +4,9 @@ import { NavLink } from 'react-router-dom';
 const navItems = [
   { to: '/home', label: 'Home' },
   { to: '/petdiary', label: 'Diary' },
-  { to: '/pictures', label: 'Pictures' },
-  { to: '/chat', label: 'Chat' },
+  { to: '/scan', label: 'Scan' },
+  { to: '/plan', label: 'Plan' },
+  { to: '/chat', label: 'Coach' },
   { to: '/settings', label: 'Settings' },
 ];
 
@@ -29,7 +30,7 @@ function BottomNav() {
           maxWidth: '1080px',
           margin: '0 auto',
           display: 'grid',
-          gridTemplateColumns: 'repeat(5, minmax(0, 1fr))',
+          gridTemplateColumns: `repeat(${navItems.length}, minmax(0, 1fr))`,
           gap: '8px',
         }}
       >

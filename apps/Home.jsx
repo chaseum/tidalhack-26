@@ -57,8 +57,8 @@ function HomePage() {
         ? 'Dental care logged this cycle.'
         : 'Dental reminder: brush teeth or book a cleaning.',
       photos.length > 0
-        ? `${photos.length} wellness photo${photos.length > 1 ? 's' : ''} stored in Pictures.`
-        : 'No photos uploaded yet. Start a visual history in Pictures.',
+        ? `${photos.length} wellness photo${photos.length > 1 ? 's' : ''} stored in Scan.`
+        : 'No photos uploaded yet. Start a visual history in Scan.',
     ];
   }, [diaryEntries, photos.length]);
 

@@ -7,14 +7,24 @@ enum DesignTokens {
     
     // MARK: - Colors
     struct Colors {
-        static let backgroundGradient = [Color(hex: "#F4F2E1"), Color(hex: "#CBE4A5")]
-        static let surface = Color(hex: "#F8F6E8")
-        static let primary = Color(hex: "#79AB61")
-        static let secondary = Color(hex: "#74C2E8")
-        static let textPrimary = Color(hex: "#1A2740")
-        static let textSecondary = Color(hex: "#586379")
-        static let border = Color(hex: "#DFDCCB")
-        static let accentSuccess = Color(hex: "#79AB61")
+        static let backgroundGradient = [
+            Color(hex: "#8FD6E8"),
+            Color(hex: "#9DDD94"),
+            Color(hex: "#F8EDD4")
+        ]
+        static let surface = Color(hex: "#FFFDF4")
+        static let primary = Color(hex: "#4D8ECA")
+        static let secondary = Color(hex: "#7FD2EE")
+        static let textPrimary = Color(hex: "#2E3448")
+        static let textSecondary = Color(hex: "#6D7488")
+        static let border = Color(hex: "#E8DFC8")
+        static let dock = Color(hex: "#C4E5EB")
+        static let waveTop = Color(hex: "#95D6E4")
+        static let waveBottom = Color(hex: "#73C7DE")
+        static let cardMint = Color(hex: "#DDEBC1")
+        static let cardPeach = Color(hex: "#F8D9BD")
+        static let cardLilac = Color(hex: "#D9D4F5")
+        static let accentSuccess = Color(hex: "#79B95B")
         static let accentWarning = Color(hex: "#F4B26D")
         static let accentDestructive = Color(hex: "#F07A86")
     }
@@ -40,12 +50,13 @@ enum DesignTokens {
     
     // MARK: - Typography
     struct Typography {
-        static let title = retro(size: 34, weight: .bold)
-        static let headline = retro(size: 20, weight: .semibold)
+        static let title = Font.system(size: 42, weight: .black, design: .rounded)
+        static let headline = Font.system(size: 22, weight: .heavy, design: .rounded)
         static let body = Font.system(size: 16, weight: .regular, design: .rounded)
-        static let caption = retro(size: 12, weight: .medium)
+        static let caption = Font.system(size: 12, weight: .semibold, design: .rounded)
+        static let pixel = retro(size: 11, weight: .medium)
         
-        static let branding = retro(size: 24, weight: .bold)
+        static let branding = Font.system(size: 28, weight: .heavy, design: .rounded)
         
         private static func retro(size: CGFloat, weight: Font.Weight) -> Font {
             // Uses custom pixel font when available in project, otherwise a built-in monospaced fallback.

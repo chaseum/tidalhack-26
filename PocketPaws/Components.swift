@@ -7,19 +7,22 @@ struct PetPalSelector: View {
     @Namespace private var ns
 
     var body: some View {
-        HStack(spacing: 6) {
+        HStack(spacing: 8) {
             ForEach(items, id: \.self) { item in
                 Text(item)
                     .font(DesignTokens.Typography.caption)
-                    .foregroundStyle(selection == item ? DesignTokens.Colors.textPrimary : DesignTokens.Colors.textSecondary)
-                    .padding(.vertical, 8)
+                    .foregroundStyle(selection == item ? Color.white : DesignTokens.Colors.textSecondary)
+                    .padding(.vertical, 10)
                     .frame(maxWidth: .infinity)
                     .background {
                         if selection == item {
                             Capsule()
-                                .fill(DesignTokens.Colors.surface)
-                                .overlay(
-                                    Capsule().stroke(DesignTokens.Colors.border, lineWidth: 1)
+                                .fill(
+                                    LinearGradient(
+                                        colors: [DesignTokens.Colors.primary, DesignTokens.Colors.secondary],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
                                 )
                                 .matchedGeometryEffect(id: "selectorBG", in: ns)
                         }
@@ -32,9 +35,10 @@ struct PetPalSelector: View {
                     }
             }
         }
-        .padding(4)
-        .background(DesignTokens.Colors.surface, in: Capsule())
+        .padding(6)
+        .background(DesignTokens.Colors.surface.opacity(0.96), in: Capsule())
         .overlay(Capsule().stroke(DesignTokens.Colors.border, lineWidth: 1))
+        .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
     }
 }
 
@@ -42,42 +46,51 @@ struct PetPalSelector: View {
 struct PetAvatarBadgeView: View {
     let pet: Pet
     var size: CGFloat = 64
-    
+
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
             AsyncImage(url: URL(string: pet.imageURL)) { image in
-                image.resizable()
+                image
+                    .resizable()
+                    .scaledToFill()
             } placeholder: {
                 DesignTokens.Colors.border
                     .overlay(ProgressView())
             }
             .frame(width: size, height: size)
             .clipShape(Circle())
-            .overlay(Circle().stroke(DesignTokens.Colors.surface, lineWidth: 2))
+            .overlay(Circle().stroke(Color.white.opacity(0.9), lineWidth: 4))
             .overlay(Circle().stroke(DesignTokens.Colors.border, lineWidth: 1))
-            
+            .shadow(color: Color.black.opacity(0.16), radius: 10, x: 0, y: 5)
+
             LevelChip(level: pet.level)
-                .offset(x: 10, y: 0)
+                .offset(x: 10, y: 4)
         }
     }
 }
 
 struct LevelChip: View {
     let level: Int
-    
+
     var body: some View {
-        HStack(spacing: 2) {
+        HStack(spacing: 4) {
             Text("LVL")
             Text("\(level)")
                 .contentTransition(.numericText())
                 .animation(.easeInOut(duration: 0.25), value: level)
         }
-        .font(DesignTokens.Typography.caption)
+        .font(DesignTokens.Typography.pixel)
         .foregroundColor(.white)
         .padding(.horizontal, DesignTokens.Spacing.s)
-        .padding(.vertical, DesignTokens.Spacing.xs)
-        .background(DesignTokens.Colors.secondary)
-        .clipShape(Capsule())
+        .padding(.vertical, 5)
+        .background(
+            Capsule()
+                .fill(DesignTokens.Colors.primary)
+        )
+        .overlay(
+            Capsule()
+                .stroke(Color.white.opacity(0.55), lineWidth: 1)
+        )
     }
 }
 
@@ -85,11 +98,10 @@ struct LevelChip: View {
 struct PillChip: View {
     let text: String
     var color: Color = DesignTokens.Colors.primary
-    
+
     var body: some View {
         Text(text)
             .font(DesignTokens.Typography.caption)
-            .fontWeight(.bold)
             .foregroundColor(.white)
             .padding(.horizontal, DesignTokens.Spacing.m)
             .padding(.vertical, DesignTokens.Spacing.xs)
@@ -102,46 +114,75 @@ struct PillChip: View {
 struct PrimaryCircleButton: View {
     let icon: String
     let action: () -> Void
-    
+
     var body: some View {
         Button(action: action) {
             Image(systemName: icon)
                 .font(.system(size: 24, weight: .bold))
                 .foregroundColor(.white)
-                .frame(width: 64, height: 64)
-                .background(DesignTokens.Colors.primary)
-                .clipShape(Circle())
-                .overlay(Circle().stroke(DesignTokens.Colors.border, lineWidth: 1))
+                .frame(width: 66, height: 66)
+                .background(
+                    Circle()
+                        .fill(
+                            LinearGradient(
+                                colors: [DesignTokens.Colors.primary, DesignTokens.Colors.secondary],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                )
+                .overlay(Circle().stroke(Color.white.opacity(0.65), lineWidth: 2))
+                .shadow(color: Color.black.opacity(0.2), radius: 9, x: 0, y: 5)
         }
+        .buttonStyle(.plain)
     }
 }
 
 struct CircularAppButton: View {
     let item: LauncherItem
     let action: () -> Void
-    
+
     var body: some View {
         Button(action: action) {
             VStack(spacing: DesignTokens.Spacing.s) {
-                RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .fill(Color(hex: item.hexColor).opacity(0.22))
+                let baseColor = Color(hex: item.hexColor)
+
+                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                baseColor.opacity(0.96),
+                                baseColor.opacity(0.76)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .overlay(
+                        Circle()
+                            .fill(Color.white.opacity(0.2))
+                            .frame(width: 34, height: 34)
+                            .offset(x: -22, y: -24)
+                    )
                     .overlay(
                         Image(systemName: item.icon)
-                            .font(.system(size: 30, weight: .medium))
-                            .foregroundColor(Color(hex: item.hexColor))
+                            .font(.system(size: 30, weight: .bold))
+                            .foregroundStyle(Color.white)
                     )
-                    .frame(width: 78, height: 78)
+                    .frame(width: 90, height: 90)
                     .overlay(
-                        RoundedRectangle(cornerRadius: 18, style: .continuous)
-                            .stroke(Color(hex: item.hexColor).opacity(0.35), lineWidth: 1)
+                        RoundedRectangle(cornerRadius: 22, style: .continuous)
+                            .stroke(Color.white.opacity(0.55), lineWidth: 2)
                     )
-                
+                    .shadow(color: baseColor.opacity(0.32), radius: 10, x: 0, y: 6)
+
                 Text(item.title)
-                    .font(DesignTokens.Typography.caption)
+                    .font(.system(size: 13, weight: .bold, design: .rounded))
                     .foregroundColor(DesignTokens.Colors.textPrimary)
                     .lineLimit(1)
             }
         }
+        .buttonStyle(.plain)
     }
 }
 
@@ -149,60 +190,88 @@ struct CircularAppButton: View {
 struct BottomNavBar: View {
     @Binding var selectedTab: AppScreen
     var onSelect: (AppScreen) -> Void = { _ in }
-    
+
     var body: some View {
-        HStack(alignment: .bottom, spacing: 14) {
-            navItem(.diary)
-            navItem(.community)
-            
+        ZStack(alignment: .top) {
+            RoundedRectangle(cornerRadius: 36, style: .continuous)
+                .fill(DesignTokens.Colors.dock.opacity(0.92))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 36, style: .continuous)
+                        .stroke(Color.white.opacity(0.65), lineWidth: 1.5)
+                )
+                .shadow(color: Color.black.opacity(0.13), radius: 16, x: 0, y: 8)
+
+            HStack(spacing: 8) {
+                navItem(.diary)
+                navItem(.community)
+                Color.clear.frame(width: 60)
+                navItem(.health)
+                navItem(.settings)
+            }
+            .padding(.horizontal, 16)
+            .padding(.top, 20)
+
             Button {
                 select(.home)
             } label: {
                 Image(systemName: icon(for: .home))
-                    .font(.system(size: 22, weight: .bold))
+                    .font(.system(size: 23, weight: .black))
                     .foregroundColor(.white)
-                    .frame(width: 54, height: 54)
-                    .background(DesignTokens.Colors.primary)
-                    .clipShape(Circle())
-                    .overlay(Circle().stroke(DesignTokens.Colors.surface, lineWidth: 3))
-                    .padding(.bottom, 8)
+                    .frame(width: 62, height: 62)
+                    .background(
+                        Circle()
+                            .fill(
+                                LinearGradient(
+                                    colors: [DesignTokens.Colors.primary, DesignTokens.Colors.secondary],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                    )
+                    .overlay(Circle().stroke(Color.white.opacity(0.7), lineWidth: 2))
+                    .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 4)
             }
             .buttonStyle(.plain)
-            
-            navItem(.health)
-            navItem(.settings)
+            .offset(y: -22)
         }
-        .padding(.horizontal, 14)
+        .frame(height: 92)
+        .padding(.horizontal, 16)
         .padding(.top, 10)
-        .padding(.bottom, 12)
-        .background(DesignTokens.Colors.surface)
-        .overlay(Rectangle().frame(height: 1).foregroundColor(DesignTokens.Colors.border), alignment: .top)
+        .padding(.bottom, 10)
     }
-    
+
     private func navItem(_ screen: AppScreen) -> some View {
-        Button {
+        let selected = selectedTab == screen
+
+        return Button {
             select(screen)
         } label: {
-            VStack(spacing: 2) {
+            VStack(spacing: 5) {
                 Image(systemName: icon(for: screen))
-                    .font(.system(size: 19, weight: .semibold))
+                    .font(.system(size: 18, weight: .bold))
+                    .frame(width: 38, height: 34)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .fill(selected ? Color.white.opacity(0.65) : .clear)
+                    )
+
                 Text(title(for: screen))
                     .font(DesignTokens.Typography.caption)
                     .lineLimit(1)
             }
             .frame(maxWidth: .infinity)
-            .foregroundColor(selectedTab == screen ? DesignTokens.Colors.primary : DesignTokens.Colors.textSecondary)
+            .foregroundColor(selected ? DesignTokens.Colors.primary : DesignTokens.Colors.textSecondary)
         }
         .buttonStyle(.plain)
     }
-    
+
     private func select(_ screen: AppScreen) {
         withAnimation(.spring(response: 0.35, dampingFraction: 0.82)) {
             selectedTab = screen
         }
         onSelect(screen)
     }
-    
+
     private func title(for screen: AppScreen) -> String {
         switch screen {
         case .home: return "Home"
@@ -214,7 +283,7 @@ struct BottomNavBar: View {
         case .shop: return "Shop"
         }
     }
-    
+
     private func icon(for screen: AppScreen) -> String {
         switch screen {
         case .home: return "house.fill"
