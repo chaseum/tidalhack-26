@@ -16,6 +16,8 @@ venv/
 
 .env
 apps/.env
+tidal-hack-pets.pem
+
 # Node / JS
 node_modules/
 services/gateway/node_modules/
