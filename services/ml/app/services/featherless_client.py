@@ -3,7 +3,11 @@ from typing import Any, Sequence
 
 from openai import APIConnectionError, APITimeoutError, OpenAI
 
-FEATHERLESS_BASE_URL = "https://api.featherless.ai/v1"
+DEFAULT_FEATHERLESS_BASE_URL = "https://api.featherless.ai/v1"
+FEATHERLESS_BASE_URL = os.getenv("FEATHERLESS_BASE_URL", DEFAULT_FEATHERLESS_BASE_URL)
+FEATHERLESS_SECRET_HEADER = os.getenv(
+    "FEATHERLESS_SECRET_HEADER", "X-Featherless-Secret-Key"
+)
 VISION_MODEL = os.getenv("VISION_MODEL", "google/gemma-3-27b-it")
 CHAT_MODEL = os.getenv("CHAT_MODEL", "meta-llama/Meta-Llama-3.1-8B-Instruct")
 REQUEST_TIMEOUT_SECONDS = float(os.getenv("FEATHERLESS_REQUEST_TIMEOUT_SECONDS", "30"))
@@ -17,11 +21,16 @@ def get_client() -> OpenAI:
         api_key = os.getenv("FEATHERLESS_API_KEY")
         if not api_key:
             raise RuntimeError("FEATHERLESS_API_KEY is not set")
+        default_headers: dict[str, str] = {}
+        secret_key = os.getenv("FEATHERLESS_SECRET_KEY")
+        if secret_key:
+            default_headers[FEATHERLESS_SECRET_HEADER] = secret_key
         _client = OpenAI(
             api_key=api_key,
             base_url=FEATHERLESS_BASE_URL,
             timeout=REQUEST_TIMEOUT_SECONDS,
             max_retries=0,
+            default_headers=default_headers,
         )
     return _client
 

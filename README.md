@@ -22,6 +22,7 @@ The gateway reads `PORT` first and falls back to `GATEWAY_PORT` for backward com
 - `S3_REGION`
 3. Required for production-quality model responses:
 - `FEATHERLESS_API_KEY`
+- `FEATHERLESS_SECRET_KEY`
 
 ## Run Gateway
 ```bash
